@@ -5,6 +5,7 @@ The goal is not only to define each module, but to show **why it exists**, **how
 
 
 
+
 ---
 
 # Table of Contents
@@ -16,9 +17,27 @@ The goal is not only to define each module, but to show **why it exists**, **how
   - [2.1 Creating a Bean with Component Scanning](#21-creating-a-bean-with-component-scanning)
   - [2.2 Creating a Bean Explicitly with `@Bean`](#22-creating-a-bean-explicitly-with-bean)
 - [3. ApplicationContext](#3-applicationcontext)
-  - [What it means](#what-it-means)
-  - [Concrete Example](#concrete-example)
+  - [What is `ApplicationContext`?](#what-is-applicationcontext)
+  - [3.1 Why Do We Need an ApplicationContext?](#31-why-do-we-need-an-applicationcontext)
+  - [3.2 How `ApplicationContext` Works with Beans](#32-how-applicationcontext-works-with-beans)
+  - [3.3 Creating an ApplicationContext Manually](#33-creating-an-applicationcontext-manually)
+  - [3.4 ApplicationContext in Spring Boot](#34-applicationcontext-in-spring-boot)
+  - [3.5 ApplicationContext vs Bean](#35-applicationcontext-vs-bean)
+  - [3.6 ApplicationContext and Dependency Injection](#36-applicationcontext-and-dependency-injection)
+  - [3.7 Key Takeaway](#37-key-takeaway)
 - [4. IoC — Inversion of Control](#4-ioc-inversion-of-control)
+  - [What is IoC?](#what-is-ioc)
+  - [4.1 The Problem Without IoC](#41-the-problem-without-ioc)
+  - [4.2 Move Object Creation Outside the Class](#42-move-object-creation-outside-the-class)
+  - [4.3 IoC in Spring](#43-ioc-in-spring)
+  - [4.4 Why IoC is Useful](#44-why-ioc-is-useful)
+  - [4.5 Benefit 1 — Easier to Change Implementations](#45-benefit-1-easier-to-change-implementations)
+  - [4.6 Benefit 2 — Easier to Test](#46-benefit-2-easier-to-test)
+  - [4.7 Benefit 3 — Centralised Object Management](#47-benefit-3-centralised-object-management)
+  - [4.8 Benefit 4 — Business Classes Stay Focused](#48-benefit-4-business-classes-stay-focused)
+  - [4.9 IoC and Dependency Injection](#49-ioc-and-dependency-injection)
+  - [4.10 Before and After IoC](#410-before-and-after-ioc)
+  - [4.11 Key Takeaway](#411-key-takeaway)
 - [5. SpEL — Spring Expression Language](#5-spel-spring-expression-language)
 - [6. Data Access / Integration](#6-data-access-integration)
 - [7. Spring JDBC](#7-spring-jdbc)
@@ -37,6 +56,12 @@ The goal is not only to define each module, but to show **why it exists**, **how
 - [11. OXM — Object/XML Mapping](#11-oxm-objectxml-mapping)
 - [12. JMS — Java Message Service](#12-jms-java-message-service)
 - [13. Web Layer](#13-web-layer)
+  - [13.1 Why Do We Need the Web Module?](#131-why-do-we-need-the-web-module)
+  - [13.2 Spring Web and Servlet](#132-spring-web-and-servlet)
+  - [13.3 Spring Web and Spring MVC](#133-spring-web-and-spring-mvc)
+  - [13.4 What Does Spring Web Provide?](#134-what-does-spring-web-provide)
+  - [13.5 Spring Web vs Spring MVC](#135-spring-web-vs-spring-mvc)
+  - [13.6 Key Takeaway](#136-key-takeaway)
 - [14. Servlet](#14-servlet)
 - [15. Spring MVC](#15-spring-mvc)
   - [Typical Spring MVC Flow](#typical-spring-mvc-flow)
@@ -253,9 +278,36 @@ All of these create Spring-managed components.
 
 ## 2.2 Creating a Bean Explicitly with `@Bean`
 
-Sometimes you cannot annotate the class directly.
+Spring commonly creates Beans by scanning classes marked with annotations such as:
+
+```java
+@Component
+@Service
+@Repository
+@Controller
+```
 
 For example:
+
+```java
+@Service
+public class PaymentService {
+}
+```
+
+When Spring scans the application, it detects `PaymentService`, creates an instance, and registers that object in the Spring container as a Bean.
+
+However, not every object can or should be created through component scanning.
+
+A common case is an object from an external library. Since the class is not part of your own source code, you normally would not modify it simply to add a Spring annotation.
+
+For example, suppose the application uses Jackson's `ObjectMapper`:
+
+```java
+ObjectMapper mapper = new ObjectMapper();
+```
+
+If you want Spring to create and manage this object, you can define it explicitly in a configuration class:
 
 ```java
 @Configuration
@@ -268,19 +320,118 @@ public class AppConfig {
 }
 ```
 
-Spring now manages the returned `ObjectMapper`.
+The `@Bean` annotation tells Spring:
 
----
+> **Register the object returned by this method in the Spring container and manage it as a Bean.**
 
+Conceptually, the method:
+
+```java
+@Bean
+public ObjectMapper objectMapper() {
+    return new ObjectMapper();
+}
+```
+
+defines **how the object should be created**, while Spring takes responsibility for managing the returned object.
+
+The resulting Bean can then be injected into another Spring-managed class:
+
+```java
+@Service
+public class JsonService {
+
+    private final ObjectMapper objectMapper;
+
+    public JsonService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+}
+```
+
+Spring finds the `ObjectMapper` Bean created by the `@Bean` method and supplies it to the `JsonService` constructor.
+
+The two common approaches can therefore be compared as follows:
+
+```text
+Component Scanning
+
+@Service
+@Component
+@Repository
+@Controller
+        |
+        v
+Spring discovers the class
+        |
+        v
+Spring creates and manages the Bean
+```
+
+```text
+Explicit Bean Configuration
+
+@Configuration
+        |
+      @Bean
+        |
+        v
+The method defines how to create the object
+        |
+        v
+Spring manages the returned object as a Bean
+```
+
+`@Bean` is also useful when object creation requires custom configuration.
+
+For example:
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        mapper.findAndRegisterModules();
+
+        return mapper;
+    }
+}
+```
+
+This allows the application to control how the object is constructed and configured before Spring manages it.
+
+A useful distinction is:
+
+> **Component scanning tells Spring which application classes should become Beans.**
+
+> **`@Bean` explicitly tells Spring how to create a particular Bean.**
+
+`@Bean` is therefore commonly used when:
+
+- the class comes from a third-party library,
+- the class cannot be annotated directly,
+- object creation requires custom configuration,
+- the application needs explicit control over how the Bean is constructed.
 # 3. ApplicationContext
 
-## What it means
+## What is `ApplicationContext`?
 
-`ApplicationContext` represents the Spring IoC container.
+`ApplicationContext` is the main Spring container used in most Spring applications.
 
-It keeps track of Spring Beans and their dependencies.
+Its role is to provide a central place where Spring:
 
-Example:
+- creates Beans,
+- keeps track of Beans,
+- resolves dependencies between Beans,
+- injects one Bean into another,
+- manages Bean lifecycle,
+- provides access to application configuration and resources.
+
+A useful mental model is:
 
 ```text
 ApplicationContext
@@ -291,12 +442,197 @@ ApplicationContext
       |
       +-- CustomerRepository
       |
+      +-- PaymentService
+      |
       +-- DataSource
 ```
 
+The important point is that these objects are not simply stored in the container.  
+Spring also understands **how they depend on one another**.
+
+For example:
+
+```text
+CustomerController
+        |
+        v
+CustomerService
+        |
+        v
+CustomerRepository
+```
+
+Spring knows that:
+
+- `CustomerController` needs `CustomerService`,
+- `CustomerService` needs `CustomerRepository`.
+
+The `ApplicationContext` coordinates the creation of these objects in the correct order and supplies the required dependencies.
+
 ---
 
-## Concrete Example
+## 3.1 Why Do We Need an ApplicationContext?
+
+Without Spring, an application must create and connect its objects manually.
+
+For example:
+
+```java
+CustomerRepository repository =
+        new CustomerRepository();
+
+CustomerService service =
+        new CustomerService(repository);
+
+CustomerController controller =
+        new CustomerController(service);
+```
+
+This is manageable when the application is small.
+
+As the application grows, the dependency graph becomes more complex:
+
+```text
+OrderController
+      |
+      v
+OrderService
+      |
+      +-------------------+
+      |                   |
+      v                   v
+PaymentService      InventoryService
+      |                   |
+      v                   v
+PaymentRepository   InventoryRepository
+```
+
+Without a container, the application must decide:
+
+- which object should be created first,
+- which dependency should be passed to which object,
+- whether an object should be reused or recreated,
+- how configuration should be supplied,
+- how object lifecycle should be managed.
+
+The `ApplicationContext` centralizes these responsibilities.
+
+Instead of manually building the object graph, application classes simply declare what they need.
+
+Example:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+    private final InventoryService inventoryService;
+
+    public OrderService(
+            PaymentService paymentService,
+            InventoryService inventoryService) {
+
+        this.paymentService = paymentService;
+        this.inventoryService = inventoryService;
+    }
+}
+```
+
+`OrderService` does not create its own dependencies.
+
+It simply declares:
+
+> **I need a `PaymentService` and an `InventoryService`.**
+
+The `ApplicationContext` finds the corresponding Beans and provides them.
+
+---
+
+## 3.2 How `ApplicationContext` Works with Beans
+
+Consider these classes:
+
+```java
+@Repository
+public class CustomerRepository {
+}
+```
+
+```java
+@Service
+public class CustomerService {
+
+    private final CustomerRepository customerRepository;
+
+    public CustomerService(
+            CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+}
+```
+
+```java
+@RestController
+public class CustomerController {
+
+    private final CustomerService customerService;
+
+    public CustomerController(
+            CustomerService customerService) {
+        this.customerService = customerService;
+    }
+}
+```
+
+When the application starts, Spring performs the following conceptually:
+
+```text
+1. Scan application classes
+        |
+        v
+2. Find Spring components
+        |
+        +-- CustomerRepository
+        +-- CustomerService
+        +-- CustomerController
+        |
+        v
+3. Create CustomerRepository
+        |
+        v
+4. Create CustomerService
+   and inject CustomerRepository
+        |
+        v
+5. Create CustomerController
+   and inject CustomerService
+```
+
+The resulting object graph is managed by the `ApplicationContext`:
+
+```text
+ApplicationContext
+      |
+      +-- CustomerRepository
+      |
+      +-- CustomerService
+      |      |
+      |      +--> CustomerRepository
+      |
+      +-- CustomerController
+             |
+             +--> CustomerService
+```
+
+This is one of the main reasons Spring applications do not need to repeatedly use `new` to construct application services and repositories.
+
+---
+
+## 3.3 Creating an ApplicationContext Manually
+
+In a basic Spring application, an `ApplicationContext` can be created manually.
+
+Example:
 
 ```java
 @Configuration
@@ -307,58 +643,652 @@ public class AppConfig {
 
 ```java
 ApplicationContext context =
-        new AnnotationConfigApplicationContext(AppConfig.class);
+        new AnnotationConfigApplicationContext(
+            AppConfig.class
+        );
+```
 
+Spring then scans the configured package, creates the Beans, and stores them in the context.
+
+A Bean can be retrieved explicitly:
+
+```java
 PaymentService paymentService =
         context.getBean(PaymentService.class);
 ```
 
-In Spring Boot, you normally do not create the context manually.
+This shows that the `ApplicationContext` acts as a registry and manager of Spring Beans.
+
+However, directly calling `getBean()` throughout application code is generally not the preferred approach.
+
+Constructor injection is normally cleaner:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(
+            PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+The application asks for its dependencies through the constructor, and Spring supplies them automatically.
+
+---
+
+## 3.4 ApplicationContext in Spring Boot
+
+In Spring Boot, the `ApplicationContext` is normally created automatically.
 
 ```java
 @SpringBootApplication
 public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(
+            Application.class,
+            args
+        );
     }
 }
 ```
 
-`SpringApplication.run(...)` creates and initializes the Spring application context.
+The call:
+
+```java
+SpringApplication.run(Application.class, args);
+```
+
+starts the Spring Boot application and creates the application context.
+
+Conceptually:
+
+```text
+SpringApplication.run(...)
+        |
+        v
+Create ApplicationContext
+        |
+        v
+Scan for Beans
+        |
+        v
+Create Beans
+        |
+        v
+Resolve Dependencies
+        |
+        v
+Application Ready
+```
+
+In a typical Spring Boot application, this happens automatically, so developers rarely create the `ApplicationContext` manually.
 
 ---
 
-# 4. IoC — Inversion of Control
+## 3.5 ApplicationContext vs Bean
 
-IoC is closely related to Spring Beans and Dependency Injection.
+These two terms are closely related but have different meanings.
 
-Without Spring:
-
-```java
-PaymentService paymentService = new PaymentService();
+```text
+Bean
+= one object managed by Spring
 ```
 
-Your application controls object creation.
+```text
+ApplicationContext
+= the container that manages all those Beans
+```
 
-With Spring:
+For example:
+
+```text
+ApplicationContext
+      |
+      +-- OrderService Bean
+      +-- PaymentService Bean
+      +-- CustomerRepository Bean
+      +-- EmailService Bean
+```
+
+A simple analogy is:
+
+```text
+ApplicationContext
+= managed workspace
+
+Bean
+= managed object inside that workspace
+```
+
+The context knows:
+
+- what Beans exist,
+- how they are created,
+- what dependencies they require,
+- how those Beans are connected.
+
+---
+
+## 3.6 ApplicationContext and Dependency Injection
+
+Dependency Injection relies on the container knowing both:
+
+1. **what objects exist**, and
+2. **what each object requires**.
+
+For example:
 
 ```java
 @Service
-public class PaymentService {
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(
+            PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
 }
 ```
 
-Spring controls object creation.
+Spring sees that the constructor requires:
 
-That change in responsibility is called:
+```text
+PaymentService
+```
 
-> **Inversion of Control**
+The `ApplicationContext` searches for a compatible `PaymentService` Bean and injects it.
 
-The application says what dependencies it needs, while the Spring container decides how to create and provide them.
+Conceptually:
+
+```text
+OrderService needs PaymentService
+            |
+            v
+ApplicationContext
+            |
+            | finds
+            v
+PaymentService Bean
+            |
+            | injects
+            v
+OrderService
+```
+
+This is the connection between:
+
+```text
+Bean
+      +
+ApplicationContext
+      +
+Dependency Injection
+      +
+Inversion of Control
+```
 
 ---
 
+## 3.7 Key Takeaway
+
+The `ApplicationContext` is the central Spring container that manages the application's Spring Beans and their relationships.
+
+Its main value is that application classes no longer need to manage object creation and dependency wiring themselves.
+
+A concise way to remember it is:
+
+> **Beans are the objects Spring manages; `ApplicationContext` is the container that creates, connects, and manages them.**
+# 4. IoC — Inversion of Control
+
+## What is IoC?
+
+IoC stands for:
+
+> **Inversion of Control**
+
+The idea is simple:
+
+> **A class should not be responsible for creating and managing all of the objects it depends on. That responsibility can be moved outside the class.**
+
+In Spring, this responsibility is handled by the Spring container.
+
+---
+
+## 4.1 The Problem Without IoC
+
+Consider an `OrderService` that needs a payment service.
+
+Without IoC, the class may create its dependency directly:
+
+```java
+public class OrderService {
+
+    private final StripePaymentService paymentService =
+            new StripePaymentService();
+
+    public void placeOrder() {
+        paymentService.pay();
+    }
+}
+```
+
+This works, but `OrderService` is now responsible for two things:
+
+```text
+OrderService
+    |
+    +-- business logic
+    |
+    +-- creating its dependency
+```
+
+It is also tightly coupled to a specific implementation:
+
+```text
+OrderService
+      |
+      v
+StripePaymentService
+```
+
+If the application later changes from Stripe to PayPal, `OrderService` must also change.
+
+---
+
+## 4.2 Move Object Creation Outside the Class
+
+A better design is to let `OrderService` declare what it needs:
+
+```java
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(
+            PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Now `OrderService` no longer creates the dependency.
+
+Some external code can decide which implementation to provide:
+
+```java
+PaymentService paymentService =
+        new StripePaymentService();
+
+OrderService orderService =
+        new OrderService(paymentService);
+```
+
+The control over object creation has moved from:
+
+```text
+OrderService
+```
+
+to:
+
+```text
+External code
+```
+
+This is the basic idea behind **Inversion of Control**.
+
+---
+
+## 4.3 IoC in Spring
+
+Spring takes this idea further by letting the container create and connect the objects.
+
+For example:
+
+```java
+@Service
+public class StripePaymentService
+        implements PaymentService {
+
+    @Override
+    public void pay() {
+        System.out.println("Pay with Stripe");
+    }
+}
+```
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(
+            PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Spring manages the creation and wiring:
+
+```text
+ApplicationContext
+        |
+        +-- creates StripePaymentService
+        |
+        +-- creates OrderService
+        |
+        +-- injects PaymentService
+            into OrderService
+```
+
+The application class only declares its dependency.
+
+Spring decides how that dependency is created and supplied.
+
+---
+
+## 4.4 Why IoC is Useful
+
+The main benefit is **loose coupling**.
+
+Without IoC:
+
+```java
+public class OrderService {
+
+    private final StripePaymentService paymentService =
+            new StripePaymentService();
+}
+```
+
+`OrderService` depends directly on one concrete implementation.
+
+With IoC:
+
+```java
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(
+            PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Now `OrderService` depends on an abstraction.
+
+For example:
+
+```java
+public interface PaymentService {
+    void pay();
+}
+```
+
+Different implementations can exist:
+
+```java
+@Service
+public class StripePaymentService
+        implements PaymentService {
+
+    public void pay() {
+        System.out.println("Pay with Stripe");
+    }
+}
+```
+
+```java
+@Service
+public class PaypalPaymentService
+        implements PaymentService {
+
+    public void pay() {
+        System.out.println("Pay with PayPal");
+    }
+}
+```
+
+Conceptually:
+
+```text
+OrderService
+      |
+      v
+PaymentService
+      |
+      +--> StripePaymentService
+      |
+      +--> PaypalPaymentService
+```
+
+`OrderService` does not need to know how the selected implementation is created.
+
+---
+
+## 4.5 Benefit 1 — Easier to Change Implementations
+
+Suppose the application initially uses Stripe:
+
+```text
+OrderService
+      |
+      v
+StripePaymentService
+```
+
+Later, the application may need PayPal:
+
+```text
+OrderService
+      |
+      v
+PaypalPaymentService
+```
+
+Because `OrderService` depends on `PaymentService` rather than a specific implementation, the service code does not need to be rewritten just because the implementation changes.
+
+This makes the design more flexible.
+
+---
+
+## 4.6 Benefit 2 — Easier to Test
+
+IoC also makes testing much easier.
+
+Suppose the real payment service calls an external payment provider.
+
+A unit test should usually avoid calling the real provider.
+
+With constructor injection, a test can supply a fake implementation:
+
+```java
+public class MockPaymentService
+        implements PaymentService {
+
+    @Override
+    public void pay() {
+        System.out.println("Mock payment");
+    }
+}
+```
+
+Then:
+
+```java
+PaymentService paymentService =
+        new MockPaymentService();
+
+OrderService orderService =
+        new OrderService(paymentService);
+```
+
+The test controls which dependency is used.
+
+Without IoC, if `OrderService` creates the real payment service internally, replacing it for testing becomes much harder.
+
+---
+
+## 4.7 Benefit 3 — Centralised Object Management
+
+Without IoC, object creation can become scattered across the application:
+
+```text
+OrderController
+      |
+      +-- new OrderService()
+              |
+              +-- new PaymentService()
+                      |
+                      +-- new PaymentRepository()
+```
+
+As the application grows, this object graph becomes increasingly difficult to manage.
+
+With Spring:
+
+```text
+ApplicationContext
+      |
+      +-- PaymentRepository
+      +-- PaymentService
+      +-- OrderService
+      +-- OrderController
+```
+
+The Spring container becomes the central place responsible for creating and connecting Spring-managed objects.
+
+---
+
+## 4.8 Benefit 4 — Business Classes Stay Focused
+
+Without IoC, business classes may contain infrastructure or construction logic:
+
+```java
+public class OrderService {
+
+    private final PaymentRepository repository;
+
+    public OrderService() {
+        this.repository =
+            new PaymentRepository();
+    }
+}
+```
+
+With IoC:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentRepository repository;
+
+    public OrderService(
+            PaymentRepository repository) {
+        this.repository = repository;
+    }
+}
+```
+
+The class now focuses on its business responsibility.
+
+It does not need to know how `PaymentRepository` is created.
+
+---
+
+## 4.9 IoC and Dependency Injection
+
+IoC is the broader design principle.
+
+Dependency Injection is one common way to implement IoC.
+
+A useful relationship is:
+
+```text
+IoC
+= move control of object creation outside the class
+
+Dependency Injection
+= provide dependencies from outside the class
+
+ApplicationContext
+= Spring container that performs IoC
+
+Bean
+= object managed by the container
+```
+
+Constructor injection is the most common example:
+
+```java
+public OrderService(
+        PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
+```
+
+The class declares what it needs, and the container provides it.
+
+---
+
+## 4.10 Before and After IoC
+
+Without IoC:
+
+```text
+OrderService
+    |
+    +-- creates PaymentService
+    +-- chooses implementation
+    +-- manages dependency
+    +-- contains business logic
+```
+
+With IoC:
+
+```text
+OrderService
+    |
+    +-- declares what it needs
+    +-- contains business logic
+
+ApplicationContext
+    |
+    +-- creates dependencies
+    +-- chooses and manages Beans
+    +-- injects dependencies
+```
+
+This separation is one of the key design ideas behind Spring.
+
+---
+
+## 4.11 Key Takeaway
+
+The practical purpose of IoC is to reduce coupling.
+
+By moving object creation and dependency management outside business classes, an application becomes:
+
+- easier to change,
+- easier to test,
+- easier to configure,
+- easier to maintain,
+- easier to scale as the number of components grows.
+
+A concise way to remember it is:
+
+> **With IoC, application classes declare what they need; the Spring container decides how those dependencies are created and supplied.**
 # 5. SpEL — Spring Expression Language
 
 SpEL allows Spring to evaluate expressions dynamically.
@@ -874,16 +1804,220 @@ These do not necessarily use JMS internally.
 
 # 13. Web Layer
 
-The Web area in Spring includes:
+The **Spring Web module** provides the basic web infrastructure used by Spring applications.
 
-- Servlet
-- Web
-- Spring MVC
-- WebSocket
-- historically, Portlet
+It is not the same as Spring MVC.
+
+A useful distinction is:
+
+```text
+Spring Web
+= core web and HTTP infrastructure
+
+Spring MVC
+= higher-level framework for controllers, web applications, and REST APIs
+```
+
+Spring Web provides the underlying support that higher-level web features depend on.
+
+Conceptually:
+
+```text
+Spring Web
+   |
+   +-- HTTP request / response support
+   +-- Servlet-based web infrastructure
+   +-- web application context support
+   +-- multipart file upload support
+   +-- HTTP headers and message handling
+   +-- common web utilities
+   |
+   v
+Spring MVC
+   |
+   v
+Controllers / REST APIs / Web Applications
+```
 
 ---
 
+## 13.1 Why Do We Need the Web Module?
+
+A web application needs infrastructure to deal with HTTP communication.
+
+For example, when a browser or another application sends:
+
+```http
+GET /customers/100
+```
+
+the server needs to handle:
+
+```text
+HTTP Request
+     |
+     v
+Web Infrastructure
+     |
+     +-- request information
+     +-- URL
+     +-- HTTP method
+     +-- headers
+     +-- parameters
+     +-- request body
+     |
+     v
+Application Logic
+     |
+     v
+HTTP Response
+```
+
+Spring Web provides the common web foundation that allows the rest of the Spring web stack to work with this request-response model.
+
+---
+
+## 13.2 Spring Web and Servlet
+
+A Servlet is part of the standard Java web platform.
+
+Spring Web builds on Servlet-based infrastructure in traditional Spring MVC applications.
+
+The relationship can be viewed as:
+
+```text
+Java Servlet API
+       |
+       v
+Spring Web
+       |
+       v
+Spring MVC
+       |
+       v
+@Controller / @RestController
+```
+
+The Servlet API provides the low-level Java web model.
+
+Spring Web adds Spring-specific web infrastructure and abstractions.
+
+Spring MVC then provides the controller-based programming model that application developers commonly use.
+
+---
+
+## 13.3 Spring Web and Spring MVC
+
+Spring MVC is built on top of the Spring Web foundation.
+
+For example:
+
+```java
+@RestController
+@RequestMapping("/customers")
+public class CustomerController {
+
+    @GetMapping("/{id}")
+    public String getCustomer(
+            @PathVariable Long id) {
+
+        return "Customer " + id;
+    }
+}
+```
+
+This controller is part of Spring MVC.
+
+However, the request still depends on the underlying web infrastructure provided by Spring Web and the Servlet environment.
+
+Conceptually:
+
+```text
+Client
+   |
+   | HTTP Request
+   v
+Servlet Container
+   |
+   v
+Spring Web
+   |
+   v
+Spring MVC
+   |
+   v
+Controller
+```
+
+So:
+
+> **Spring Web provides the foundation; Spring MVC provides the controller-based framework built on top of it.**
+
+---
+
+## 13.4 What Does Spring Web Provide?
+
+At a high level, the Spring Web module provides support for:
+
+- HTTP request and response handling,
+- Servlet-based web applications,
+- web-specific application context support,
+- HTTP headers,
+- request and response bodies,
+- multipart file uploads,
+- web-related utility classes,
+- integration used by higher-level Spring web technologies.
+
+For example, when uploading a file in a Spring MVC application:
+
+```java
+@PostMapping("/upload")
+public String upload(
+        @RequestParam("file")
+        MultipartFile file) {
+
+    return file.getOriginalFilename();
+}
+```
+
+The controller is a Spring MVC feature, while multipart request support relies on the underlying Spring web infrastructure.
+
+---
+
+## 13.5 Spring Web vs Spring MVC
+
+A concise comparison is:
+
+| Term | Role |
+|---|---|
+| **Servlet** | Standard Java technology for handling web requests and responses |
+| **Spring Web** | Core Spring infrastructure for web and HTTP applications |
+| **Spring MVC** | Higher-level Spring framework for controllers, web applications, and REST APIs |
+
+The relationship is:
+
+```text
+Servlet
+   |
+   v
+Spring Web
+   |
+   v
+Spring MVC
+   |
+   v
+Application Controller
+```
+
+---
+
+## 13.6 Key Takeaway
+
+The Spring Web module provides the core web infrastructure used by Spring applications.
+
+It is important to distinguish it from Spring MVC:
+
+> **Spring Web provides the underlying HTTP and web support, while Spring MVC uses that support to build controllers, web applications, and REST APIs.**
 # 14. Servlet
 
 A Servlet is part of the standard Java web platform.
@@ -1812,34 +2946,92 @@ OrderService
 
 # 34. Recommended Learning Priority
 
-You do **not** need to learn every Spring module at the same depth.
+The learning priority below is mapped to the existing sections in this tutorial and aligned with the course sequence.
 
-For modern Spring Boot development, a useful priority is:
+| Course Topic | Related Section(s) in This Tutorial | Priority |
+|---|---|---|
+| JPA Intro Part 1 | **8. ORM — Object Relational Mapping** | High |
+| JPA Intro Part 2 | **8. ORM — Object Relational Mapping** | High |
+| JPQL | **8. ORM — Object Relational Mapping** | High |
+| Spring Boot MVC | **13. Web Layer**, **14. Servlet**, **15. Spring MVC**, **16. DispatcherServlet**, **31. Spring Framework vs Spring Boot** | High |
+| Spring Boot MVC + Spring Data + Dependency Injection | **2. Spring Bean**, **3. ApplicationContext**, **4. IoC — Inversion of Control**, **9. Spring Data JPA**, **15. Spring MVC** | High |
+| Spring Boot MVC Full Stack + JUnit | **15. Spring MVC**, **30. Spring Test**, **32. End-to-End Concrete Example**, **33. How Everything Fits Together** | High |
+| Spring Boot MVC + Service Layer | **4. IoC — Inversion of Control**, **15. Spring MVC**, **32. End-to-End Concrete Example**, **33. How Everything Fits Together** | High |
+| Spring Boot Workshops | Review and apply **2–10**, **15–16**, **30–33** | High |
+| Spring Session / Validation / Interceptors | **15. Spring MVC**, **16. DispatcherServlet** | Medium |
+| Spring Transactions + Service Layer | **10. Transactions**, **19. AOP**, **20. Spring AOP Proxy**, **32. End-to-End Concrete Example** | High |
+| Spring REST API | **13. Web Layer**, **14. Servlet**, **15. Spring MVC**, **16. DispatcherServlet**, **32. End-to-End Concrete Example** | High |
+| Spring Reactive | Related to the web and messaging concepts in **13. Web Layer**, **17. WebSocket**, and **28. Messaging** | Later / Advanced |
 
-1. IoC and Dependency Injection
-2. Spring Beans
-3. `ApplicationContext`
-4. Constructor Injection
-5. Spring Boot Auto-Configuration
-6. Spring MVC
-7. REST Controllers
-8. Service Layer
-9. Repository Layer
-10. JDBC
-11. JPA and Hibernate
-12. Spring Data JPA
-13. Transactions
-14. Spring Security
-15. AOP
-16. Spring Test
-17. Messaging
-18. WebSocket
-19. OXM
-20. Instrumentation
-21. Portlet as legacy awareness only
+Based on this course flow, the existing tutorial sections can be studied in the following order:
 
----
+1. **8. ORM — Object Relational Mapping**
+   - JPA fundamentals
+   - Hibernate as a JPA implementation
+   - persistence concepts
 
+2. **9. Spring Data JPA**
+   - repository abstraction
+   - integration between Spring and JPA
+
+3. **7. Spring JDBC**
+   - understand JDBC as the underlying Java database connectivity mechanism
+   - focus on the JDBC driver, connection configuration, and its relationship to JPA
+
+4. **31. Spring Framework vs Spring Boot**
+   - understand what Spring Boot adds on top of the Spring Framework
+
+5. **2. Spring Bean**
+   - understand Spring-managed objects
+
+6. **3. ApplicationContext**
+   - understand the role of the Spring container
+
+7. **4. IoC — Inversion of Control**
+   - understand why dependency creation is moved to the container
+   - understand Dependency Injection and loose coupling
+
+8. **13. Web Layer**
+
+9. **14. Servlet**
+
+10. **15. Spring MVC**
+
+11. **16. DispatcherServlet**
+    - understand the MVC request flow
+
+12. **32. End-to-End Concrete Example**
+    - connect Controller, Service, Repository, JPA, and Dependency Injection
+
+13. **33. How Everything Fits Together**
+    - consolidate the complete application structure
+
+14. **30. Spring Test**
+    - JUnit and Spring-aware testing
+
+15. **10. Transactions**
+    - transaction boundaries in the service layer
+
+16. **19–25. AOP**
+    - understand how Spring can apply cross-cutting behaviour such as transaction management
+
+17. **29. Spring Security**
+    - authentication and authorization
+
+18. **17. WebSocket** and **28. Messaging**
+    - real-time and message-based communication
+
+19. **5. SpEL**, **11. OXM**, **12. JMS**, **26. Aspects Module**, **27. Instrumentation**
+    - useful supporting or advanced topics
+
+20. **18. Portlet**
+    - legacy awareness only
+
+The key emphasis for this course is:
+
+> **JPA and persistence concepts come first, followed by Spring Boot MVC, Spring-managed components and Dependency Injection, then full-stack layering, testing, transactions, REST, and more advanced Spring capabilities.**
+
+The tutorial should therefore be used as a **reference map of Spring concepts**, while the course sequence determines when each section is introduced in depth.
 # 35. Quick Reference
 
 | Term | Main Purpose |
