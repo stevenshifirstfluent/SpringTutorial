@@ -282,7 +282,7 @@ Configure `application.properties`:
 ```properties
 spring.datasource.url=jdbc:h2:mem:shoppingdb
 spring.datasource.username=sa
-spring.datasource.password=
+spring.datasource.password=you-defined-password
 
 spring.jpa.hibernate.ddl-auto=create-drop
 spring.jpa.show-sql=true
