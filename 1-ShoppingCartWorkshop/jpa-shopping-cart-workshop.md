@@ -217,19 +217,7 @@ private Double unitPrice;
 
 # 3A. Reference ERD
 
-Use the following ERD together with the ERD provided by the lecturer. The class names, relationships, owning sides, foreign keys, and property names are aligned with the Java source code used in this workshop.
-
-```mermaid
-erDiagram
-    USER ||--|| CART : has
-    USER ||--o{ PURCHASE_ORDER : places
-    CART ||--o{ CART_ITEM : contains
-    PRODUCT ||--o{ CART_ITEM : selected_as
-    CATEGORY ||--o{ PRODUCT : classifies
-    PRODUCT }o--o{ TAG : tagged_with
-    PURCHASE_ORDER ||--o{ ORDER_ITEM : contains
-    PRODUCT ||--o{ ORDER_ITEM : purchased_as
-```
+Use ERD provided by the lecturer. The class names, relationships, owning sides, foreign keys, and property names are aligned with the Java source code used in this workshop.
 
 The `Product`–`Tag` many-to-many relationship uses this join table:
 
