@@ -6,12 +6,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 
-import jakarta.persistence.EntityManager;
 import sg.edu.nus.empdemo.model.Employee;
 import sg.edu.nus.empdemo.model.Project;
 
@@ -19,93 +18,98 @@ import sg.edu.nus.empdemo.model.Project;
 class ProjectRepositoryTest {
 
     @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    @Test
+    void shouldFindProjectByExactName() {
 
-    @Autowired
-    private EntityManager entityManager;
-
-    private Project aiProject;
-    private Project webProject;
-    private Project legacyProject;
-
-    private Employee alice;
-    private Employee bob;
-
-    @BeforeEach
-    void setUp() {
-
-        aiProject = new Project(
+        // Arrange
+        Project project = new Project(
                 "AI Platform",
                 "Enterprise AI Platform",
                 LocalDate.of(2026, 1, 1),
                 LocalDate.of(2026, 12, 31));
 
-        webProject = new Project(
-                "Web Portal",
-                "Employee Web Portal",
-                LocalDate.of(2026, 3, 1),
-                LocalDate.of(2026, 9, 30));
-
-        legacyProject = new Project(
-                "Legacy Migration",
-                "Legacy system migration",
-                LocalDate.of(2025, 1, 1),
-                LocalDate.of(2025, 12, 31));
-
-        alice = new Employee("Alice Tan");
-        bob = new Employee("Bob Lim");
-
-        alice.addProject(aiProject);
-        alice.addProject(webProject);
-
-        bob.addProject(aiProject);
-
-        employeeRepository.save(alice);
-        employeeRepository.save(bob);
-
-        projectRepository.save(legacyProject);
-
-        employeeRepository.flush();
-
+        entityManager.persistAndFlush(project);
         entityManager.clear();
-    }
 
-    @Test
-    void shouldFindProjectByExactName() {
+        // Act
+        List<Project> result =
+                projectRepository
+                        .findByName("AI Platform");
 
-        List<Project> projects =
-                projectRepository.findByName("AI Platform");
+        // Assert
+        assertThat(result).hasSize(1);
 
-        assertThat(projects).hasSize(1);
-
-        assertThat(projects.get(0).getName())
+        assertThat(result.get(0).getName())
                 .isEqualTo("AI Platform");
     }
 
     @Test
     void shouldFindProjectByPartialNameIgnoringCase() {
 
-        List<Project> projects =
+        // Arrange
+        Project project = new Project(
+                "AI Platform",
+                "Enterprise AI Platform",
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31));
+
+        entityManager.persistAndFlush(project);
+        entityManager.clear();
+
+        // Act
+        List<Project> result =
                 projectRepository
-                        .findByNameContainingIgnoreCase("platform");
+                        .findByNameContainingIgnoreCase(
+                                "platform");
 
-        assertThat(projects).hasSize(1);
+        // Assert
+        assertThat(result).hasSize(1);
 
-        assertThat(projects.get(0).getName())
+        assertThat(result.get(0).getName())
                 .isEqualTo("AI Platform");
     }
 
     @Test
     void shouldFindProjectsEndingAfterDate() {
 
-        List<Project> projects =
+        // Arrange
+        Project project1 = new Project(
+                "AI Platform",
+                "AI",
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31));
+
+        Project project2 = new Project(
+                "Web Portal",
+                "Web",
+                LocalDate.of(2026, 3, 1),
+                LocalDate.of(2026, 9, 30));
+
+        Project project3 = new Project(
+                "Legacy Migration",
+                "Legacy",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 12, 31));
+
+        entityManager.persist(project1);
+        entityManager.persist(project2);
+        entityManager.persist(project3);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Act
+        List<Project> result =
                 projectRepository.findByEndDateAfter(
                         LocalDate.of(2026, 6, 1));
 
-        assertThat(projects)
+        // Assert
+        assertThat(result)
                 .extracting(Project::getName)
                 .containsExactlyInAnyOrder(
                         "AI Platform",
@@ -115,12 +119,40 @@ class ProjectRepositoryTest {
     @Test
     void shouldFindProjectsWithinDateRange() {
 
-        List<Project> projects =
+        // Arrange
+        Project project1 = new Project(
+                "AI Platform",
+                "AI",
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31));
+
+        Project project2 = new Project(
+                "Web Portal",
+                "Web",
+                LocalDate.of(2026, 3, 1),
+                LocalDate.of(2026, 9, 30));
+
+        Project project3 = new Project(
+                "Legacy Migration",
+                "Legacy",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 12, 31));
+
+        entityManager.persist(project1);
+        entityManager.persist(project2);
+        entityManager.persist(project3);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Act
+        List<Project> result =
                 projectRepository.findByDateRange(
                         LocalDate.of(2026, 1, 1),
                         LocalDate.of(2026, 12, 31));
 
-        assertThat(projects)
+        // Assert
+        assertThat(result)
                 .extracting(Project::getName)
                 .containsExactlyInAnyOrder(
                         "AI Platform",
@@ -130,17 +162,45 @@ class ProjectRepositoryTest {
     @Test
     void shouldFetchProjectWithEmployees() {
 
-        Optional<Project> result =
-                projectRepository.findByIdWithEmployees(
-                        aiProject.getId());
+        // Arrange
+        Project project = new Project(
+                "AI Platform",
+                "Enterprise AI Platform",
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31));
 
+        entityManager.persistAndFlush(project);
+
+        Employee alice =
+                new Employee("Alice Tan");
+
+        Employee bob =
+                new Employee("Bob Lim");
+
+        alice.addProject(project);
+        bob.addProject(project);
+
+        entityManager.persist(alice);
+        entityManager.persist(bob);
+
+        entityManager.flush();
+
+        Long projectId = project.getId();
+
+        entityManager.clear();
+
+        // Act
+        Optional<Project> result =
+                projectRepository
+                        .findByIdWithEmployees(projectId);
+
+        // Assert
         assertThat(result).isPresent();
 
-        Project project = result.get();
+        assertThat(result.get().getEmployees())
+                .hasSize(2);
 
-        assertThat(project.getEmployees()).hasSize(2);
-
-        assertThat(project.getEmployees())
+        assertThat(result.get().getEmployees())
                 .extracting(Employee::getName)
                 .containsExactlyInAnyOrder(
                         "Alice Tan",
@@ -150,13 +210,40 @@ class ProjectRepositoryTest {
     @Test
     void shouldFindProjectsByEmployeeId() {
 
-        List<Project> projects =
-                projectRepository.findByEmployeesId(
-                        alice.getId());
+        // Arrange
+        Project project1 = new Project(
+                "AI Platform",
+                "AI",
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31));
 
-        assertThat(projects).hasSize(2);
+        Project project2 = new Project(
+                "Web Portal",
+                "Web",
+                LocalDate.of(2026, 2, 1),
+                LocalDate.of(2026, 9, 30));
 
-        assertThat(projects)
+        Employee employee =
+                new Employee("Alice Tan");
+
+        employee.addProject(project1);
+        employee.addProject(project2);
+
+        entityManager.persistAndFlush(employee);
+
+        Long employeeId = employee.getId();
+
+        entityManager.clear();
+
+        // Act
+        List<Project> result =
+                projectRepository
+                        .findByEmployeesId(employeeId);
+
+        // Assert
+        assertThat(result).hasSize(2);
+
+        assertThat(result)
                 .extracting(Project::getName)
                 .containsExactlyInAnyOrder(
                         "AI Platform",
