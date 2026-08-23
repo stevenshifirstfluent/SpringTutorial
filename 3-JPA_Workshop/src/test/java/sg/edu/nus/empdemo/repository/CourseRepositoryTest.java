@@ -6,12 +6,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 
-import jakarta.persistence.EntityManager;
 import sg.edu.nus.empdemo.model.Course;
 import sg.edu.nus.empdemo.model.Employee;
 
@@ -19,65 +18,47 @@ import sg.edu.nus.empdemo.model.Employee;
 class CourseRepositoryTest {
 
     @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
     private CourseRepository courseRepository;
-
-    @Autowired
-    private EmployeeRepository employeeRepository;
-
-    @Autowired
-    private EntityManager entityManager;
-
-    private Employee alice;
-    private Employee bob;
-
-    private Course springBoot;
-    private Course springJpa;
-    private Course python;
-
-    @BeforeEach
-    void setUp() {
-
-        alice = new Employee("Alice Tan");
-        bob = new Employee("Bob Lim");
-
-        springBoot = new Course(
-                "Spring Boot",
-                2.0,
-                LocalDate.of(2026, 3, 1));
-
-        springJpa = new Course(
-                "Spring Data JPA",
-                1.5,
-                LocalDate.of(2026, 5, 1));
-
-        python = new Course(
-                "Python Programming",
-                3.0,
-                LocalDate.of(2026, 2, 1));
-
-        alice.addCourse(springBoot);
-        alice.addCourse(springJpa);
-
-        bob.addCourse(python);
-
-        employeeRepository.save(alice);
-        employeeRepository.save(bob);
-
-        employeeRepository.flush();
-
-        entityManager.clear();
-    }
 
     @Test
     void shouldFindCourseByPartialNameIgnoringCase() {
 
-        List<Course> courses =
+        // Arrange
+        Course course1 = new Course(
+                "Spring Boot",
+                2.0,
+                LocalDate.of(2026, 3, 1));
+
+        Course course2 = new Course(
+                "Spring Data JPA",
+                1.5,
+                LocalDate.of(2026, 5, 1));
+
+        Course course3 = new Course(
+                "Python Programming",
+                3.0,
+                LocalDate.of(2026, 2, 1));
+
+        entityManager.persist(course1);
+        entityManager.persist(course2);
+        entityManager.persist(course3);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Act
+        List<Course> result =
                 courseRepository
-                        .findByNameContainingIgnoreCase("spring");
+                        .findByNameContainingIgnoreCase(
+                                "spring");
 
-        assertThat(courses).hasSize(2);
+        // Assert
+        assertThat(result).hasSize(2);
 
-        assertThat(courses)
+        assertThat(result)
                 .extracting(Course::getName)
                 .containsExactlyInAnyOrder(
                         "Spring Boot",
@@ -87,25 +68,69 @@ class CourseRepositoryTest {
     @Test
     void shouldFindCoursesStartingAfterDate() {
 
-        List<Course> courses =
+        // Arrange
+        Course course1 = new Course(
+                "Spring Boot",
+                2.0,
+                LocalDate.of(2026, 3, 1));
+
+        Course course2 = new Course(
+                "Spring Data JPA",
+                1.5,
+                LocalDate.of(2026, 5, 1));
+
+        entityManager.persist(course1);
+        entityManager.persist(course2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Act
+        List<Course> result =
                 courseRepository.findByStartsAfter(
                         LocalDate.of(2026, 3, 15));
 
-        assertThat(courses)
-                .extracting(Course::getName)
-                .containsExactly("Spring Data JPA");
+        // Assert
+        assertThat(result).hasSize(1);
+
+        assertThat(result.get(0).getName())
+                .isEqualTo("Spring Data JPA");
     }
 
     @Test
     void shouldFindCoursesByMaximumDuration() {
 
-        List<Course> courses =
+        // Arrange
+        Course course1 = new Course(
+                "Spring Boot",
+                2.0,
+                LocalDate.of(2026, 3, 1));
+
+        Course course2 = new Course(
+                "Spring Data JPA",
+                1.5,
+                LocalDate.of(2026, 5, 1));
+
+        Course course3 = new Course(
+                "Python Programming",
+                3.0,
+                LocalDate.of(2026, 2, 1));
+
+        entityManager.persist(course1);
+        entityManager.persist(course2);
+        entityManager.persist(course3);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Act
+        List<Course> result =
                 courseRepository
-                        .findByDurationInMonthsLessThanEqual(2.0);
+                        .findByDurationInMonthsLessThanEqual(
+                                2.0);
 
-        assertThat(courses).hasSize(2);
-
-        assertThat(courses)
+        // Assert
+        assertThat(result)
                 .extracting(Course::getName)
                 .containsExactlyInAnyOrder(
                         "Spring Boot",
@@ -115,13 +140,43 @@ class CourseRepositoryTest {
     @Test
     void shouldFindCoursesByEmployeeId() {
 
-        List<Course> courses =
-                courseRepository.findByEmployeeId(
-                        alice.getId());
+        // Arrange
+        Employee employee =
+                new Employee("Alice Tan");
 
-        assertThat(courses).hasSize(2);
+        entityManager.persistAndFlush(employee);
 
-        assertThat(courses)
+        Course course1 = new Course(
+                "Spring Boot",
+                2.0,
+                LocalDate.of(2026, 3, 1));
+
+        Course course2 = new Course(
+                "Spring Data JPA",
+                1.5,
+                LocalDate.of(2026, 5, 1));
+
+        course1.setEmployee(employee);
+        course2.setEmployee(employee);
+
+        entityManager.persist(course1);
+        entityManager.persist(course2);
+
+        entityManager.flush();
+
+        Long employeeId = employee.getId();
+
+        entityManager.clear();
+
+        // Act
+        List<Course> result =
+                courseRepository
+                        .findByEmployeeId(employeeId);
+
+        // Assert
+        assertThat(result).hasSize(2);
+
+        assertThat(result)
                 .extracting(Course::getName)
                 .containsExactlyInAnyOrder(
                         "Spring Boot",
@@ -131,32 +186,84 @@ class CourseRepositoryTest {
     @Test
     void shouldFetchCourseWithEmployee() {
 
-        Optional<Course> result =
-                courseRepository.findByIdWithEmployee(
-                        springBoot.getId());
+        // Arrange
+        Employee employee =
+                new Employee("Alice Tan");
 
+        entityManager.persistAndFlush(employee);
+
+        Course course = new Course(
+                "Spring Boot",
+                2.0,
+                LocalDate.of(2026, 3, 1));
+
+        course.setEmployee(employee);
+
+        entityManager.persistAndFlush(course);
+
+        Long courseId = course.getId();
+
+        entityManager.clear();
+
+        // Act
+        Optional<Course> result =
+                courseRepository
+                        .findByIdWithEmployee(courseId);
+
+        // Assert
         assertThat(result).isPresent();
 
-        Course course = result.get();
+        assertThat(result.get().getEmployee())
+                .isNotNull();
 
-        assertThat(course.getEmployee()).isNotNull();
-
-        assertThat(course.getEmployee().getName())
+        assertThat(result.get()
+                .getEmployee()
+                .getName())
                 .isEqualTo("Alice Tan");
     }
 
     @Test
     void shouldFindCoursesByEmployeeAndStartDate() {
 
-        List<Course> courses =
+        // Arrange
+        Employee employee =
+                new Employee("Alice Tan");
+
+        entityManager.persistAndFlush(employee);
+
+        Course course1 = new Course(
+                "Spring Boot",
+                2.0,
+                LocalDate.of(2026, 3, 1));
+
+        Course course2 = new Course(
+                "Spring Data JPA",
+                1.5,
+                LocalDate.of(2026, 5, 1));
+
+        course1.setEmployee(employee);
+        course2.setEmployee(employee);
+
+        entityManager.persist(course1);
+        entityManager.persist(course2);
+
+        entityManager.flush();
+
+        Long employeeId = employee.getId();
+
+        entityManager.clear();
+
+        // Act
+        List<Course> result =
                 courseRepository
                         .findByEmployeeIdAndStartsAfter(
-                                alice.getId(),
+                                employeeId,
                                 LocalDate.of(2026, 4, 1));
 
-        assertThat(courses).hasSize(1);
+        // Assert
+        assertThat(result).hasSize(1);
 
-        assertThat(courses.get(0).getName())
+        assertThat(result.get(0).getName())
                 .isEqualTo("Spring Data JPA");
     }
 }
