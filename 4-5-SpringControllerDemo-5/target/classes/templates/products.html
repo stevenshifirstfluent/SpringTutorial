@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+
+<body>
+
+<!--
+    Link to the page used to create
+    a new Product.
+-->
+<a th:href="@{/product/add}"
+   th:utext="#{products.page.add}">
+    Add Product
+</a>
+
+
+<!--
+    Display the page heading only when
+    the product list is not empty.
+-->
+<h2 th:if="${not #lists.isEmpty(products)}"
+    th:utext="#{products.page.header}">
+    Product List
+</h2>
+
+
+<!--
+    Display the product table only when
+    products are available.
+-->
+<table th:if="${not #lists.isEmpty(products)}"
+       border="1">
+
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Brand</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Date of Manufacture</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+    </thead>
+
+
+    <tbody>
+
+    <!--
+        Iterate through every Product
+        stored in the "products" model attribute.
+    -->
+    <tr th:each="product : ${products}">
+
+        <td th:text="${product.id}">
+            ID
+        </td>
+
+        <td th:text="${product.name}">
+            Name
+        </td>
+
+        <td th:text="${product.brand}">
+            Brand
+        </td>
+
+        <td th:text="${product.description}">
+            Description
+        </td>
+
+        <td th:text="${product.price}">
+            Price
+        </td>
+
+        <td th:text="${#temporals.format(product.dom, 'dd-MM-yyyy')}">
+            Date
+        </td>
+
+
+        <!--
+            Example generated URL:
+
+            /product/edit/1
+        -->
+        <td>
+            <a th:href="@{/product/edit/{id}(id=${product.id})}"
+               th:utext="#{products.page.edit}">
+                Edit
+            </a>
+        </td>
+
+
+        <!--
+            Example generated URL:
+
+            /product/delete/1
+        -->
+        <td>
+            <a th:href="@{/product/delete/{id}(id=${product.id})}"
+               th:utext="#{products.page.delete}">
+                Delete
+            </a>
+        </td>
+
+    </tr>
+
+    </tbody>
+
+</table>
+
+</body>
+
+</html>

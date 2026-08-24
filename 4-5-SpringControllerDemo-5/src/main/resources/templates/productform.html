@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Product Form</title>
+
+</head>
+
+<body>
+
+<!--
+    Read the page title from
+    messages.properties.
+-->
+<h1 th:utext="#{productform.page.title}">
+    Product Form
+</h1>
+
+
+<!--
+    th:object="${product}"
+
+    connects this form to the Product object
+    stored in the Spring MVC Model.
+
+    th:action defines the URL used when
+    the form is submitted.
+
+    method="post" sends a POST request.
+-->
+<form
+        action="#"
+        th:object="${product}"
+        th:action="@{/product/save}"
+        method="post">
+
+
+    <!--
+        Store the Product ID.
+
+        For a new Product:
+        id is initially 0.
+
+        For an existing Product:
+        the ID is preserved so JPA knows
+        which record should be updated.
+    -->
+    <fieldset>
+
+        <input
+                type="hidden"
+                th:field="*{id}">
+
+    </fieldset>
+
+
+    <!--
+        Bind the input field to:
+
+        Product.name
+    -->
+    <fieldset>
+
+        Name:
+
+        <input
+                type="text"
+                th:field="*{name}">
+
+    </fieldset>
+
+
+    <!--
+        Bind the input field to:
+
+        Product.brand
+    -->
+    <fieldset>
+
+        Type:
+
+        <input
+                type="text"
+                th:field="*{brand}">
+
+    </fieldset>
+
+
+    <!--
+        Bind the input field to:
+
+        Product.description
+    -->
+    <fieldset>
+
+        Description:
+
+        <input
+                type="text"
+                th:field="*{description}">
+
+    </fieldset>
+
+
+    <!--
+        Bind the input field to:
+
+        Product.price
+    -->
+    <fieldset>
+
+        Price:
+
+        <input
+                type="text"
+                th:field="*{price}">
+
+    </fieldset>
+
+
+    <!--
+        Bind the input field to:
+
+        Product.dom
+
+        Product.java uses:
+
+        @DateTimeFormat(
+            pattern = "dd-MM-yyyy"
+        )
+
+        Example input:
+
+        24-08-2026
+    -->
+    <fieldset>
+
+        Date of Manufacture:
+
+        <input
+                type="text"
+                th:field="*{dom}"
+                placeholder="dd-MM-yyyy">
+
+    </fieldset>
+
+
+    <!--
+        Submit the form to:
+
+        POST /product/save
+    -->
+    <fieldset>
+
+        <button type="submit">
+            Save
+        </button>
+
+    </fieldset>
+
+</form>
+
+</body>
+
+</html>
