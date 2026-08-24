@@ -1,0 +1,13 @@
+<!-- src/main/resources/templates/searchGet.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Search (GET)</title></head>
+<body>
+<h2>Search Products (GET)</h2>
+<form action="/products/search" method="get">
+  <label>Name: <input type="text" name="name" value="laptop"/></label>
+  <label>Limit: <input type="number" name="limit" value="10"/></label>
+  <button type="submit">Search</button>
+</form>
+</body>
+</html>

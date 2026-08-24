@@ -1,0 +1,30 @@
+<!-- src/main/resources/templates/productResults.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Results</title></head>
+<body>
+<h2 th:text="'Results for: ' + ${name} + ' (limit=' + ${limit} + ') '"></h2>
+
+<table border="1" cellpadding="6">
+  <thead>
+  <tr><th>ID</th><th>Name</th><th>Price</th></tr>
+  </thead>
+  <tbody>
+  <tr th:each="p : ${products}">
+    <td th:text="${p.id}">1</td>
+    <td th:text="${p.name}">name</td>
+    <td th:text="${p.price}">0</td>
+  </tr>
+  <tr th:if="${#lists.isEmpty(products)}">
+    <td colspan="3">No results</td>
+  </tr>
+  </tbody>
+</table>
+
+<p>
+  <a href="/products/search?name=laptop&limit=10">Try GET example</a> |
+  <a href="/searchGet">Open GET form</a> |
+  <a href="/searchPost">Open POST form</a>
+</p>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!-- src/main/resources/templates/greetingPage.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Greeting Page</title>
+</head>
+<body>
+    <h1>Welcome to the Greeting Page!</h1>
+
+    <!-- Use the model attribute 'message' -->
+    <p th:text="'Message from Controller: ' + ${message}"></p>
+</body>
+</html>

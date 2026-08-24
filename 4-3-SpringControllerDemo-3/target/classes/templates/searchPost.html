@@ -1,0 +1,13 @@
+<!-- src/main/resources/templates/searchPost.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Search (POST)</title></head>
+<body>
+<h2>Search Products (POST)</h2>
+<form action="/products/search" method="post">
+  <label>Name: <input type="text" name="name" value="laptop"/></label>
+  <label>Limit: <input type="number" name="limit" value="10"/></label>
+  <button type="submit">Search</button>
+</form>
+</body>
+</html>
