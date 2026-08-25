@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Thymeleaf Demo</title>
+
+</head>
+
+
+<body>
+
+
+<h1>Thymeleaf Demo</h1>
+
+
+<!-- ====================================================== -->
+<!-- 1. MESSAGE EXPRESSION                                  -->
+<!-- ====================================================== -->
+
+<h2>1. Message Expression - #{...}</h2>
+
+
+<!--
+    #{...} reads a message from messages.properties.
+
+    messages.properties:
+
+        home.welcome=Steven!
+-->
+<p th:text="#{home.welcome}">
+    Welcome
+</p>
+
+
+<!--
+    Message expression with a parameter.
+
+    messages.properties:
+
+        home.welcome.user=
+        Welcome to our grocery store, {0}!
+
+    ${session.user.name} is passed into {0}.
+-->
+<p th:text="#{home.welcome.user(${session.user.name})}">
+    Welcome User
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 2. th:text                                             -->
+<!-- ====================================================== -->
+
+<h2>2. th:text</h2>
+
+
+<p>
+
+    User:
+
+    <span th:text="${session.user.name}">
+        Default User
+    </span>
+
+</p>
+
+
+<p>
+
+    Current Year:
+
+    <span th:text="${year}">
+        2000
+    </span>
+
+</p>
+
+
+<p>
+
+    Two Years Later:
+
+    <span th:text="${year + 2}">
+        2002
+    </span>
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 3. th:text VS th:utext                                 -->
+<!-- ====================================================== -->
+
+<h2>3. th:text vs th:utext</h2>
+
+
+<!--
+    th:text escapes HTML.
+
+    The <strong> tag is displayed as text.
+-->
+<h3>th:text</h3>
+
+<p th:text="${htmlMessage}">
+    Message
+</p>
+
+
+<!--
+    th:utext does NOT escape HTML.
+
+    The <strong> tag is interpreted by the browser.
+
+    Use th:utext only with trusted or sanitized content.
+-->
+<h3>th:utext</h3>
+
+<p th:utext="${htmlMessage}">
+    Message
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 4. VARIABLE EXPRESSION                                 -->
+<!-- ====================================================== -->
+
+<h2>4. Variable Expression - ${...}</h2>
+
+
+<p>
+
+    Today:
+
+    <span th:text="${today}">
+        Date
+    </span>
+
+</p>
+
+
+<p>
+
+    User:
+
+    <span th:text="${session.user.name}">
+        User
+    </span>
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 5. PROPERTY NAVIGATION                                 -->
+<!-- ====================================================== -->
+
+<h2>5. Object Property Navigation</h2>
+
+
+<p>
+
+    User:
+
+    <span th:text="${session.user.name}">
+        Name
+    </span>
+
+</p>
+
+
+<!--
+    Thymeleaf navigates through JavaBean properties.
+
+    session.user.address.country
+
+    corresponds conceptually to:
+
+    user.getAddress().getCountry()
+-->
+<p>
+
+    Country:
+
+    <span th:text="${session.user.address.country}">
+        Country
+    </span>
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 6. STRING CONCATENATION                                -->
+<!-- ====================================================== -->
+
+<h2>6. String Concatenation</h2>
+
+
+<p th:text="
+        'Welcome to our application, '
+        + ${session.user.name}
+        + '!'">
+
+    Welcome
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 7. ARITHMETIC                                          -->
+<!-- ====================================================== -->
+
+<h2>7. Arithmetic</h2>
+
+
+<p>
+
+    Product Count:
+
+    <span th:text="${prodStatCount}">
+        0
+    </span>
+
+</p>
+
+
+<p>
+
+    Product Count Modulo 2:
+
+    <span th:text="${prodStatCount % 2}">
+        0
+    </span>
+
+</p>
+
+
+<div th:with="
+        isEven=${prodStatCount % 2 == 0}">
+
+    <p>
+
+        Is Even:
+
+        <span th:text="${isEven}">
+            false
+        </span>
+
+    </p>
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 8. RELATIONAL OPERATOR                                 -->
+<!-- ====================================================== -->
+
+<h2>8. Relational Operator</h2>
+
+
+<div th:if="${prodStatCount > 1}">
+
+    Product count is greater than 1.
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 9. CONDITIONAL OPERATOR                                -->
+<!-- ====================================================== -->
+
+<h2>9. Conditional Operator</h2>
+
+
+<p th:text="
+        ${execMode == 'dev'}
+            ? 'Development'
+            : 'Production'">
+
+    Execution Mode
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 10. DEFAULT VALUE                                      -->
+<!-- ====================================================== -->
+
+<h2>10. Default Value</h2>
+
+
+<div th:object="${session.user}">
+
+    <p>
+
+        Age:
+
+        <span th:text="
+                *{age}
+                ?: '(no age specified)'">
+
+            Age
+
+        </span>
+
+    </p>
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 11. SELECTION EXPRESSION                               -->
+<!-- ====================================================== -->
+
+<h2>11. Selection Expression - *{...}</h2>
+
+
+<!--
+    th:object selects an object.
+
+    *{...} then accesses properties
+    relative to that object.
+-->
+<div th:object="${session.user}">
+
+    <p>
+
+        Name:
+
+        <span th:text="*{firstName}">
+            Name
+        </span>
+
+    </p>
+
+
+    <p>
+
+        Surname:
+
+        <span th:text="*{lastName}">
+            Surname
+        </span>
+
+    </p>
+
+
+    <p>
+
+        Nationality:
+
+        <span th:text="*{nationality}">
+            Nationality
+        </span>
+
+    </p>
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 12. EQUIVALENT ${...} EXPRESSIONS                      -->
+<!-- ====================================================== -->
+
+<h2>12. Equivalent Variable Expressions</h2>
+
+
+<p>
+
+    Name:
+
+    <span th:text="${session.user.firstName}">
+        Name
+    </span>
+
+</p>
+
+
+<p>
+
+    Surname:
+
+    <span th:text="${session.user.lastName}">
+        Surname
+    </span>
+
+</p>
+
+
+<p>
+
+    Nationality:
+
+    <span th:text="${session.user.nationality}">
+        Nationality
+    </span>
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 13. URL EXPRESSIONS                                    -->
+<!-- ====================================================== -->
+
+<h2>13. URL Expressions - @{...}</h2>
+
+
+<!--
+    Query parameter URL.
+
+    If user.id = 3:
+
+        /order/details?orderId=3
+-->
+<p>
+
+    <a th:href="@{/order/details(
+            orderId=${session.user.id}
+        )}">
+
+        View Order using Query Parameter
+
+    </a>
+
+</p>
+
+
+<!--
+    Path-variable URL.
+
+    If user.id = 3:
+
+        /order/3/details
+-->
+<p>
+
+    <a th:href="@{/order/{orderId}/details(
+            orderId=${session.user.id}
+        )}">
+
+        View Order using Path Variable
+
+    </a>
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 14. th:attr                                            -->
+<!-- ====================================================== -->
+
+<h2>14. th:attr</h2>
+
+
+<!--
+    th:attr dynamically sets a normal
+    HTML attribute.
+
+    action becomes:
+
+        /subscribe
+
+    #{subscribe.submit}
+
+    reads the button text from messages.properties.
+-->
+<form th:attr="
+        action=@{/subscribe}"
+      method="post">
+
+    <fieldset>
+
+        <input
+                type="text"
+                name="email"
+                placeholder="Enter email"
+        />
+
+
+        <input
+                type="submit"
+                th:attr="
+                    value=#{subscribe.submit}"
+        />
+
+    </fieldset>
+
+</form>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 15. DEDICATED THYMELEAF ATTRIBUTES                     -->
+<!-- ====================================================== -->
+
+<h2>15. Dedicated Thymeleaf Attributes</h2>
+
+
+<!--
+    This is normally clearer than using th:attr.
+-->
+<form th:action="@{/subscribe}"
+      method="post">
+
+    <input
+            type="text"
+            name="email"
+            placeholder="Enter email"
+    />
+
+
+    <input
+            type="submit"
+            th:value="#{subscribe.submit}"
+    />
+
+</form>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 16. UTILITY OBJECTS                                    -->
+<!-- ====================================================== -->
+
+<h2>16. Utility Objects</h2>
+
+
+<p>
+
+    Uppercase Name:
+
+    <span th:text="
+        ${#strings.toUpperCase(
+            session.user.firstName
+        )}">
+
+        NAME
+
+    </span>
+
+</p>
+
+
+<p>
+
+    Name Length:
+
+    <span th:text="
+        ${#strings.length(
+            session.user.name
+        )}">
+
+        0
+
+    </span>
+
+</p>
+
+
+<p>
+
+    Formatted Number:
+
+    <span th:text="
+        ${#numbers.formatDecimal(
+            12345.678,
+            1,
+            2
+        )}">
+
+        Number
+
+    </span>
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 17. SELECTION EXPRESSIONS                              -->
+<!-- ====================================================== -->
+
+<h2>17. Selection Expressions</h2>
+
+
+<div th:object="${session.user}">
+
+    <p>
+
+        <strong>
+            *{firstName}:
+        </strong>
+
+        <span th:text="*{firstName}">
+            Name
+        </span>
+
+    </p>
+
+
+    <p>
+
+        Equivalent:
+
+        <span th:text="${session.user.firstName}">
+            Name
+        </span>
+
+    </p>
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 18. URL GENERATION                                     -->
+<!-- ====================================================== -->
+
+<h2>18. URL Generation</h2>
+
+
+<p>
+
+    <a th:href="@{/order/details(
+            orderId=${session.user.id}
+        )}">
+
+        Query Parameter URL
+
+    </a>
+
+</p>
+
+
+<p>
+
+    <a th:href="@{/order/{orderId}/details(
+            orderId=${session.user.id}
+        )}">
+
+        Path Variable URL
+
+    </a>
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 19. ITERATION - th:each                                -->
+<!-- ====================================================== -->
+
+<h2>19. Iteration - th:each</h2>
+
+
+<table border="1">
+
+    <thead>
+
+    <tr>
+
+        <th>Index</th>
+
+        <th>Count</th>
+
+        <th>Name</th>
+
+        <th>Price</th>
+
+        <th>Size</th>
+
+        <th>First?</th>
+
+        <th>Last?</th>
+
+    </tr>
+
+    </thead>
+
+
+    <tbody>
+
+
+    <!--
+        product = current Product
+
+        stat = iteration status
+
+        stat.index starts from 0
+        stat.count starts from 1
+    -->
+    <tr th:each="
+            product, stat
+            : ${products}">
+
+
+        <td th:text="${stat.index}">
+            0
+        </td>
+
+
+        <td th:text="${stat.count}">
+            1
+        </td>
+
+
+        <td th:text="${product.name}">
+            Product
+        </td>
+
+
+        <td th:text="${product.price}">
+            Price
+        </td>
+
+
+        <td th:text="${stat.size}">
+            Size
+        </td>
+
+
+        <td th:text="${stat.first}">
+            First
+        </td>
+
+
+        <td th:text="${stat.last}">
+            Last
+        </td>
+
+
+    </tr>
+
+
+    </tbody>
+
+</table>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 20. PRODUCT TABLE                                      -->
+<!-- ====================================================== -->
+
+<h2>20. Product Table</h2>
+
+
+<!--
+    Display the table only when
+    products is not empty.
+-->
+<div th:if="
+        ${not #lists.isEmpty(products)}">
+
+
+    <table border="1">
+
+        <thead>
+
+        <tr>
+
+            <th>ID</th>
+
+            <th>Name</th>
+
+            <th>Description</th>
+
+            <th>Type</th>
+
+            <th>Category</th>
+
+            <th>Price</th>
+
+            <th>Stock</th>
+
+        </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+        <tr th:each="
+                product : ${products}">
+
+
+            <td th:text="${product.id}">
+                ID
+            </td>
+
+
+            <td th:text="${product.name}">
+                Name
+            </td>
+
+
+            <td th:text="${product.description}">
+                Description
+            </td>
+
+
+            <td th:text="${product.type}">
+                Type
+            </td>
+
+
+            <td th:text="${product.category}">
+                Category
+            </td>
+
+
+            <td th:text="${product.price}">
+                Price
+            </td>
+
+
+            <td th:text="
+                ${product.inStock
+                    ? 'Yes'
+                    : 'No'}">
+
+                Stock
+
+            </td>
+
+
+        </tr>
+
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 21. th:if                                              -->
+<!-- ====================================================== -->
+
+<h2>21. th:if</h2>
+
+
+<div th:each="
+        product : ${products}">
+
+
+    <p>
+
+
+        <strong th:text="${product.name}">
+            Product
+        </strong>
+
+
+        <!--
+            Display this link only when
+            comments are available.
+        -->
+        <a th:href="@{/product/comments(
+                prodId=${product.id}
+            )}"
+
+           th:if="
+            ${not #lists.isEmpty(
+                product.comments
+            )}">
+
+            View Comments
+
+        </a>
+
+
+    </p>
+
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 22. th:unless                                          -->
+<!-- ====================================================== -->
+
+<h2>22. th:unless</h2>
+
+
+<div th:each="
+        product : ${products}">
+
+
+    <p>
+
+
+        <strong th:text="${product.name}">
+            Product
+        </strong>
+
+
+        <!--
+            th:unless renders when the expression
+            evaluates to false.
+
+            Therefore this appears when comments
+            are NOT empty.
+        -->
+        <span th:unless="
+            ${#lists.isEmpty(
+                product.comments
+            )}">
+
+            - Comments available
+
+        </span>
+
+
+        <span th:if="
+            ${#lists.isEmpty(
+                product.comments
+            )}">
+
+            - No comments
+
+        </span>
+
+
+    </p>
+
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 23. th:switch / th:case                                -->
+<!-- ====================================================== -->
+
+<h2>23. th:switch / th:case</h2>
+
+
+<div th:switch="${session.user.role}">
+
+
+    <p th:case="'admin'">
+
+        User is an administrator.
+
+    </p>
+
+
+    <p th:case="'manager'">
+
+        User is a manager.
+
+    </p>
+
+
+    <!-- Default case -->
+    <p th:case="*">
+
+        User is a normal user.
+
+    </p>
+
+
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 24. #temporals                                         -->
+<!-- ====================================================== -->
+
+<h2>24. Date and Time - #temporals</h2>
+
+
+<p>
+
+    Original:
+
+    <span th:text="${now}">
+        Date
+    </span>
+
+</p>
+
+
+<p>
+
+    Formatted:
+
+    <span th:text="
+        ${#temporals.format(
+            now,
+            'dd/MM/yyyy HH:mm'
+        )}">
+
+        Date
+
+    </span>
+
+</p>
+
+
+<p>
+
+    Day:
+
+    <span th:text="
+        ${#temporals.day(now)}">
+
+        Day
+
+    </span>
+
+</p>
+
+
+<p>
+
+    Month:
+
+    <span th:text="
+        ${#temporals.month(now)}">
+
+        Month
+
+    </span>
+
+</p>
+
+
+<p>
+
+    Month Name:
+
+    <span th:text="
+        ${#temporals.monthName(now)}">
+
+        Month
+
+    </span>
+
+</p>
+
+
+<p>
+
+    Year:
+
+    <span th:text="
+        ${#temporals.year(now)}">
+
+        Year
+
+    </span>
+
+</p>
+
+
+<p>
+
+    Day of Week:
+
+    <span th:text="
+        ${#temporals.dayOfWeekName(now)}">
+
+        Day
+
+    </span>
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 25. TEMPLATE FRAGMENT                                  -->
+<!-- ====================================================== -->
+
+<h2>25. Template Fragment</h2>
+
+
+<!--
+    footer refers to:
+
+        footer.html
+
+    copy refers to:
+
+        th:fragment="copy"
+-->
+<div th:insert="
+        ~{footer :: copy}">
+</div>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 26. INTERNATIONALIZATION                               -->
+<!-- ====================================================== -->
+
+<h2>26. Internationalization</h2>
+
+
+<!--
+    These links change the Locale.
+
+    Requires LocaleChangeInterceptor
+    configured with:
+
+        lang
+-->
+<p>
+
+    <a th:href="@{/thymeleaf-demo(
+            lang='en',
+            paymentType=${paymentType}
+        )}">
+
+        English
+
+    </a>
+
+    |
+
+    <a th:href="@{/thymeleaf-demo(
+            lang='zh',
+            paymentType=${paymentType}
+        )}">
+
+        中文
+
+    </a>
+
+</p>
+
+
+<h3 th:text="
+        #{languagepage.hello}">
+
+    Hello
+
+</h3>
+
+
+<p th:text="
+        #{languagepage.greeting}">
+
+    Greeting
+
+</p>
+
+
+<!--
+    {0} receives data1.
+
+    {1} receives data2.
+-->
+<p th:text="
+        #{languagepage.message(
+            ${data1},
+            ${data2}
+        )}">
+
+    Message
+
+</p>
+
+
+<p th:text="
+        #{languagepage.bye}">
+
+    Goodbye
+
+</p>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 27. FORM BINDING                                       -->
+<!-- ====================================================== -->
+
+<h2>27. Form Binding - th:object / th:field</h2>
+
+
+<!--
+    customerForm becomes the selected
+    form-backing object.
+
+    *{firstName}
+
+    means:
+
+    customerForm.firstName
+-->
+<form th:action="@{/customer/save}"
+      th:object="${customerForm}"
+      method="post">
+
+
+    <!-- Hidden ID -->
+    <input
+            type="hidden"
+            th:field="*{id}"
+    />
+
+
+    <p>
+
+        <label for="firstName">
+            First Name:
+        </label>
+
+
+        <!--
+            th:field automatically manages:
+
+            id
+            name
+            value
+        -->
+        <input
+                type="text"
+                th:field="*{firstName}"
+        />
+
+    </p>
+
+
+    <p>
+
+        <label for="lastName">
+            Last Name:
+        </label>
+
+
+        <input
+                type="text"
+                th:field="*{lastName}"
+        />
+
+    </p>
+
+
+    <p>
+        Gender:
+    </p>
+
+
+    <!--
+        Generate radio buttons from the
+        genders collection.
+    -->
+    <div th:each="
+            genderOption : ${genders}">
+
+
+        <input
+                type="radio"
+                th:field="*{gender}"
+                th:value="${genderOption}"
+        />
+
+
+        <label
+                th:for="${#ids.prev('gender')}"
+                th:text="${genderOption}">
+
+            Gender
+
+        </label>
+
+
+    </div>
+
+
+    <p>
+
+
+        <label for="paymentMethod">
+            Payment Method:
+        </label>
+
+
+        <select th:field="*{paymentMethod}">
+
+
+            <option
+                    th:each="
+                        payment
+                        : ${paymentMethods}"
+
+                    th:value="${payment}"
+
+                    th:text="${payment}">
+
+                Payment
+
+            </option>
+
+
+        </select>
+
+
+    </p>
+
+
+    <p>
+
+
+        <label for="balance">
+            Balance:
+        </label>
+
+
+        <input
+                type="number"
+                step="0.01"
+                th:field="*{balance}"
+        />
+
+
+    </p>
+
+
+    <button type="submit">
+        Save Customer
+    </button>
+
+
+</form>
+
+
+
+<hr>
+
+
+<!-- ====================================================== -->
+<!-- 28. INPUT TYPES AND DYNAMIC RADIO BUTTONS               -->
+<!-- ====================================================== -->
+
+<h2>28. Input Types with th:field</h2>
+
+
+<!--
+    IMPORTANT:
+
+    All *{...} expressions below must remain
+    inside this form because this form defines:
+
+        th:object="${inputForm}"
+-->
+<form th:action="@{/input/save}"
+      th:object="${inputForm}"
+      method="post">
+
+
+    <!-- ================================================== -->
+    <!-- TEXT INPUT                                         -->
+    <!-- ================================================== -->
+
+    <p>
+
+
+        <label for="textValue">
+            Text Value:
+        </label>
+
+
+        <input
+                type="text"
+                th:field="*{textValue}"
+        />
+
+
+    </p>
+
+
+
+    <!-- ================================================== -->
+    <!-- NUMBER INPUT                                       -->
+    <!-- ================================================== -->
+
+    <p>
+
+
+        <label for="numberValue">
+            Number Value:
+        </label>
+
+
+        <input
+                type="number"
+                th:field="*{numberValue}"
+        />
+
+
+    </p>
+
+
+
+    <!-- ================================================== -->
+    <!-- PASSWORD INPUT                                     -->
+    <!-- ================================================== -->
+
+    <p>
+
+
+        <label for="passwordValue">
+            Password Value:
+        </label>
+
+
+        <input
+                type="password"
+                th:field="*{passwordValue}"
+        />
+
+
+    </p>
+
+
+
+    <!-- ================================================== -->
+    <!-- HIDDEN INPUT                                       -->
+    <!-- ================================================== -->
+
+    <!--
+        Hidden value is submitted with the form
+        but is not displayed to the user.
+    -->
+    <input
+            type="hidden"
+            th:field="*{hiddenValue}"
+    />
+
+
+
+    <!-- ================================================== -->
+    <!-- STATIC RADIO BUTTONS                               -->
+    <!-- ================================================== -->
+
+    <h3>Static Radio Buttons</h3>
+
+
+    <!--
+        These options are manually written
+        into the HTML.
+    -->
+
+    <input
+            type="radio"
+            id="radioVal1"
+            value="Radio Value 1"
+            th:field="*{radioValue}"
+    />
+
+
+    <label for="radioVal1">
+
+        Radio Value 1
+
+    </label>
+
+
+    <br>
+
+
+    <input
+            type="radio"
+            id="radioVal2"
+            value="Radio Value 2"
+            th:field="*{radioValue}"
+    />
+
+
+    <label for="radioVal2">
+
+        Radio Value 2
+
+    </label>
+
+
+
+    <!-- ================================================== -->
+    <!-- DYNAMIC RADIO BUTTONS                              -->
+    <!-- ================================================== -->
+
+    <h3>Dynamic Radio Buttons</h3>
+
+
+    <!--
+        The links demonstrate that the Controller
+        can change the radio-button options without
+        changing the HTML template.
+    -->
+
+    <p>
+
+
+        <a th:href="@{/thymeleaf-demo(
+                paymentType='local'
+            )}">
+
+            Local Payment Options
+
+        </a>
+
+
+        |
+
+
+        <a th:href="@{/thymeleaf-demo(
+                paymentType='international'
+            )}">
+
+            International Payment Options
+
+        </a>
+
+
+    </p>
+
+
+    <p>
+
+        Current Option Group:
+
+        <strong th:text="${paymentType}">
+            local
+        </strong>
+
+    </p>
+
+
+    <!--
+        LOCAL Controller data:
+
+            PayNow
+            Credit Card
+            Bank Transfer
+
+
+        INTERNATIONAL Controller data:
+
+            Credit Card
+            PayPal
+            International Transfer
+
+
+        The HTML below does not change.
+
+        th:each automatically creates the
+        required radio buttons.
+    -->
+    <div th:each="
+            dynamicRadioOption
+            : ${dynamicRadioOptions}">
+
+
+        <!--
+            All generated radio buttons are
+            bound to:
+
+                inputForm.dynamicRadioValue
+
+            th:value determines the value
+            submitted for this radio button.
+        -->
+        <input
+                type="radio"
+                th:field="*{dynamicRadioValue}"
+                th:value="${dynamicRadioOption}"
+        />
+
+
+        <!--
+            #ids.prev(...) refers to the id
+            generated by the preceding th:field.
+        -->
+        <label
+
+                th:for="${
+                    #ids.prev(
+                        'dynamicRadioValue'
+                    )
+                }"
+
+                th:text="${dynamicRadioOption}">
+
+            Payment Option
+
+        </label>
+
+
+        <br>
+
+
+    </div>
+
+
+    <br>
+
+
+    <button type="submit">
+        Submit Input Form
+    </button>
+
+
+</form>
+
+
+
+</body>
+
+</html>

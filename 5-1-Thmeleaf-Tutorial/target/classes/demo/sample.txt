@@ -1,0 +1,3 @@
+Hello from Spring Resource!
+
+This file demonstrates Spring's Resource abstraction.

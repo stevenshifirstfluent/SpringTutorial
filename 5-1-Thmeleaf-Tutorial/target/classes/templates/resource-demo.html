@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Spring Resource Demo</title>
+
+</head>
+
+
+<body>
+
+
+<h1>Spring Resource Demo</h1>
+
+
+<!--
+    exists()
+
+    Indicates whether the Spring Resource
+    actually exists.
+-->
+<p>
+
+    Resource Exists:
+
+    <strong th:text="${resourceExists}">
+        true
+    </strong>
+
+</p>
+
+
+<!--
+    isOpen()
+
+    Indicates whether the Resource currently
+    represents an open stream.
+-->
+<p>
+
+    Resource Is Open:
+
+    <strong th:text="${resourceOpen}">
+        false
+    </strong>
+
+</p>
+
+
+<!--
+    getDescription()
+
+    Provides a human-readable description
+    of the Resource.
+-->
+<p>
+
+    Description:
+
+    <strong th:text="${resourceDescription}">
+        Resource description
+    </strong>
+
+</p>
+
+
+<h2>Resource Content</h2>
+
+
+<!--
+    The Resource contents were read using:
+
+        resource.getInputStream()
+
+    inside the Spring controller.
+-->
+<pre th:text="${resourceContent}">
+    Resource content
+</pre>
+
+
+<p>
+
+    <a th:href="@{/thymeleaf-demo}">
+        Back to Thymeleaf Demo
+    </a>
+
+</p>
+
+
+</body>
+
+</html>
