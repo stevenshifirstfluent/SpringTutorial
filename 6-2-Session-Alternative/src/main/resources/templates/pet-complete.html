@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Session Complete</title>
+
+    <style>
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fa;
+        }
+
+        .card {
+            width: 650px;
+            margin: 60px auto;
+            padding: 30px;
+            background: white;
+            border: 1px solid #e1e5ea;
+            border-radius: 10px;
+        }
+
+        .message {
+            padding: 14px;
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            border-radius: 6px;
+            color: #9a3412;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+    <h1>Session Conversation Complete</h1>
+
+
+    <div class="message">
+
+        <strong>SessionStatus.setComplete()</strong>
+        was called.
+
+        <br><br>
+
+        The <strong>pet</strong> attribute managed by
+        <strong>@SessionAttributes</strong> has been cleared.
+
+        <br><br>
+
+        The entire HTTP session was
+        <strong>not</strong> invalidated.
+
+    </div>
+
+
+    <a th:href="@{/pets/form}">
+
+        Start again
+
+    </a>
+
+
+</div>
+
+
+</body>
+
+</html>
