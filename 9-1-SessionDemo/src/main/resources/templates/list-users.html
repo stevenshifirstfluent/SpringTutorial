@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>User List</title>
+</head>
+<body>
+  <h2>Protected Page</h2>
+
+  <p>
+  Hi <span th:text="${session.username != null ? session.username : 'Guest'}"></span>
+  <p> Hi 
+   <p th:if="${session.username != null}">
+    <a th:href="@{/protected/logout}">Logout</a>
+  </p>
+</body>
+</html>
