@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width,
+                     initial-scale=1.0">
+
+    <title>
+        Spring Global Exception Handler Demo
+    </title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                    Arial,
+                    sans-serif;
+
+            background:
+                    #f4f6f8;
+
+            color:
+                    #263238;
+        }
+
+
+        header {
+
+            background:
+                    #263238;
+
+            color:
+                    white;
+
+            padding:
+                    28px 40px;
+        }
+
+
+        header h1 {
+
+            margin:
+                    0 0 8px;
+        }
+
+
+        header p {
+
+            margin: 0;
+
+            color:
+                    #cfd8dc;
+        }
+
+
+        main {
+
+            max-width:
+                    1250px;
+
+            margin:
+                    30px auto;
+
+            padding:
+                    0 20px;
+        }
+
+
+        .grid {
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    repeat(
+                            2,
+                            1fr
+                    );
+
+            gap:
+                    22px;
+        }
+
+
+        .card {
+
+            background:
+                    white;
+
+            border-radius:
+                    10px;
+
+            padding:
+                    24px;
+
+            box-shadow:
+                    0 2px 10px
+                    rgba(
+                            0,
+                            0,
+                            0,
+                            0.08
+                    );
+        }
+
+
+        .card h2 {
+
+            margin-top: 0;
+        }
+
+
+        .number {
+
+            display:
+                    inline-block;
+
+            margin-right:
+                    8px;
+
+            width:
+                    30px;
+
+            height:
+                    30px;
+
+            line-height:
+                    30px;
+
+            text-align:
+                    center;
+
+            border-radius:
+                    50%;
+
+            color:
+                    white;
+
+            background:
+                    #1976d2;
+        }
+
+
+        .description {
+
+            color:
+                    #607d8b;
+
+            font-size:
+                    14px;
+
+            line-height:
+                    1.6;
+        }
+
+
+        .expected {
+
+            margin:
+                    15px 0;
+
+            padding:
+                    10px;
+
+            border-left:
+                    4px solid #1976d2;
+
+            background:
+                    #e3f2fd;
+
+            font-size:
+                    14px;
+        }
+
+
+        .endpoint {
+
+            display:
+                    inline-block;
+
+            margin:
+                    10px 0;
+
+            padding:
+                    6px 9px;
+
+            border-radius:
+                    4px;
+
+            background:
+                    #eceff1;
+
+            font-family:
+                    monospace;
+        }
+
+
+        label {
+
+            display:
+                    block;
+
+            margin-top:
+                    12px;
+
+            margin-bottom:
+                    5px;
+
+            font-weight:
+                    bold;
+        }
+
+
+        input {
+
+            width:
+                    100%;
+
+            padding:
+                    9px;
+
+            border:
+                    1px solid #b0bec5;
+
+            border-radius:
+                    5px;
+
+            font-size:
+                    14px;
+        }
+
+
+        input.error-input {
+
+            border:
+                    2px solid #d32f2f;
+
+            background:
+                    #fff8f8;
+        }
+
+
+        .field-error {
+
+            display:
+                    block;
+
+            min-height:
+                    17px;
+
+            margin-top:
+                    4px;
+
+            color:
+                    #d32f2f;
+
+            font-size:
+                    12px;
+
+            line-height:
+                    1.4;
+        }
+
+
+        button {
+
+            margin:
+                    10px 5px 0 0;
+
+            padding:
+                    10px 15px;
+
+            border:
+                    none;
+
+            border-radius:
+                    5px;
+
+            color:
+                    white;
+
+            background:
+                    #1976d2;
+
+            cursor:
+                    pointer;
+        }
+
+
+        button:hover {
+
+            opacity:
+                    0.88;
+        }
+
+
+        button.danger {
+
+            background:
+                    #c62828;
+        }
+
+
+        button.success {
+
+            background:
+                    #2e7d32;
+        }
+
+
+        button.secondary {
+
+            background:
+                    #546e7a;
+        }
+
+
+        .response-panel {
+
+            margin-top:
+                    30px;
+
+            border-radius:
+                    10px;
+
+            overflow:
+                    hidden;
+
+            background:
+                    #212121;
+
+            color:
+                    #eeeeee;
+        }
+
+
+        .response-header {
+
+            padding:
+                    18px 22px;
+
+            background:
+                    #37474f;
+        }
+
+
+        .response-header h2 {
+
+            margin:
+                    0 0 10px;
+        }
+
+
+        .badges {
+
+            display:
+                    flex;
+
+            flex-wrap:
+                    wrap;
+
+            gap:
+                    8px;
+        }
+
+
+        .badge {
+
+            padding:
+                    5px 10px;
+
+            border-radius:
+                    14px;
+
+            background:
+                    #546e7a;
+
+            font-size:
+                    13px;
+        }
+
+
+        .response-content {
+
+            padding:
+                    22px;
+        }
+
+
+        .flow {
+
+            margin-bottom:
+                    22px;
+
+            padding:
+                    15px;
+
+            border:
+                    1px solid #455a64;
+
+            border-radius:
+                    6px;
+
+            font-family:
+                    monospace;
+
+            line-height:
+                    1.8;
+
+            color:
+                    #b2dfdb;
+
+            white-space:
+                    pre-wrap;
+        }
+
+
+        pre {
+
+            margin: 0;
+
+            white-space:
+                    pre-wrap;
+
+            word-break:
+                    break-word;
+
+            font-family:
+                    monospace;
+        }
+
+
+        code {
+
+            font-family:
+                    monospace;
+        }
+
+
+        @media (
+                max-width: 850px
+        ) {
+
+            .grid {
+
+                grid-template-columns:
+                        1fr;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <h1>
+        Spring Validation & Global Exception Handling
+    </h1>
+
+    <p>
+        Trigger different validation failures
+        and observe which global exception handler
+        processes the request.
+    </p>
+
+</header>
+
+
+<main>
+
+
+    <div class="grid">
+
+
+        <!-- ================================================= -->
+        <!-- 1. MethodArgumentNotValidException                -->
+        <!-- ================================================= -->
+
+        <section class="card">
+
+
+            <h2>
+
+                <span class="number">
+                    1
+                </span>
+
+                Request Body Validation
+
+            </h2>
+
+
+            <p class="description">
+
+                Demonstrates Bean Validation on:
+
+                <code>
+                    @Valid @RequestBody User
+                </code>
+
+            </p>
+
+
+            <div class="expected">
+
+                Expected exception:
+
+                <strong>
+                    MethodArgumentNotValidException
+                </strong>
+
+            </div>
+
+
+            <div class="endpoint">
+
+                POST /api/users/register
+
+            </div>
+
+
+            <!-- Username -->
+
+            <label for="username">
+
+                Username
+
+            </label>
+
+            <input
+                    id="username"
+                    type="text"
+                    value="ab">
+
+            <span
+                    id="usernameError"
+                    class="field-error">
+            </span>
+
+
+
+            <!-- Email -->
+
+            <label for="email">
+
+                Email
+
+            </label>
+
+            <input
+                    id="email"
+                    type="text"
+                    value="wrong-email">
+
+            <span
+                    id="emailError"
+                    class="field-error">
+            </span>
+
+
+
+            <!-- Password -->
+
+            <label for="password">
+
+                Password
+
+            </label>
+
+            <input
+                    id="password"
+                    type="text"
+                    value="abc">
+
+            <span
+                    id="passwordError"
+                    class="field-error">
+            </span>
+
+
+
+            <!-- Age -->
+
+            <label for="age">
+
+                Age
+
+            </label>
+
+            <input
+                    id="age"
+                    type="number"
+                    value="15">
+
+            <span
+                    id="ageError"
+                    class="field-error">
+            </span>
+
+
+
+            <!-- Date of Birth -->
+
+            <label for="dateOfBirth">
+
+                Date of Birth
+
+            </label>
+
+            <input
+                    id="dateOfBirth"
+                    type="date"
+                    value="2030-01-01">
+
+            <span
+                    id="dateOfBirthError"
+                    class="field-error">
+            </span>
+
+
+
+            <!-- Phone Number -->
+
+            <label for="phoneNumber">
+
+                Phone Number
+
+            </label>
+
+            <input
+                    id="phoneNumber"
+                    type="text"
+                    value="123">
+
+            <span
+                    id="phoneNumberError"
+                    class="field-error">
+            </span>
+
+
+
+            <button
+                    class="danger"
+                    onclick="sendUserRequest()">
+
+                Send Request
+
+            </button>
+
+
+            <button
+                    class="success"
+                    onclick="loadValidUser()">
+
+                Load Valid Data
+
+            </button>
+
+
+            <button
+                    class="secondary"
+                    onclick="loadInvalidUser()">
+
+                Load Invalid Data
+
+            </button>
+
+
+        </section>
+
+
+
+        <!-- ================================================= -->
+        <!-- 2. HandlerMethodValidationException               -->
+        <!-- ================================================= -->
+
+        <section class="card">
+
+
+            <h2>
+
+                <span class="number">
+                    2
+                </span>
+
+                Controller Parameter Validation
+
+            </h2>
+
+
+            <p class="description">
+
+                Demonstrates a validation constraint
+                directly declared on a Spring MVC
+                controller method parameter.
+
+            </p>
+
+
+            <pre>
+@PathVariable
+@Min(
+    value = 1,
+    message =
+        "User id must be at least 1"
+)
+Long id
+            </pre>
+
+
+            <div class="expected">
+
+                Expected exception:
+
+                <strong>
+                    HandlerMethodValidationException
+                </strong>
+
+            </div>
+
+
+            <div class="endpoint">
+
+                GET /api/users/{id}
+
+            </div>
+
+
+            <label for="controllerId">
+
+                User ID
+
+            </label>
+
+
+            <input
+                    id="controllerId"
+                    type="number"
+                    value="0">
+
+
+            <span
+                    id="controllerIdError"
+                    class="field-error">
+            </span>
+
+
+            <button
+                    class="danger"
+                    onclick="testControllerValidation()">
+
+                Send Request
+
+            </button>
+
+
+            <button
+                    class="success"
+                    onclick="setControllerId(1)">
+
+                Use Valid ID
+
+            </button>
+
+
+            <button
+                    class="secondary"
+                    onclick="setControllerId(0)">
+
+                Use Invalid ID
+
+            </button>
+
+
+        </section>
+
+
+
+        <!-- ================================================= -->
+        <!-- 3. ConstraintViolationException                   -->
+        <!-- ================================================= -->
+
+        <section class="card">
+
+
+            <h2>
+
+                <span class="number">
+                    3
+                </span>
+
+                Service Method Validation
+
+            </h2>
+
+
+            <p class="description">
+
+                Demonstrates method validation
+                on a Spring service annotated with
+
+                <code>
+                    @Validated
+                </code>.
+
+            </p>
+
+
+            <pre>
+@Service
+@Validated
+public class ValidationDemoService {
+
+    public String checkUserId(
+        @Min(1)
+        Long id) {
+        ...
+    }
+}
+            </pre>
+
+
+            <div class="expected">
+
+                Expected exception:
+
+                <strong>
+                    ConstraintViolationException
+                </strong>
+
+            </div>
+
+
+            <div class="endpoint">
+
+                GET /api/validation/service/{id}
+
+            </div>
+
+
+            <label for="serviceId">
+
+                Service User ID
+
+            </label>
+
+
+            <input
+                    id="serviceId"
+                    type="number"
+                    value="0">
+
+
+            <span
+                    id="serviceIdError"
+                    class="field-error">
+            </span>
+
+
+            <button
+                    class="danger"
+                    onclick="testServiceValidation()">
+
+                Send Request
+
+            </button>
+
+
+            <button
+                    class="success"
+                    onclick="setServiceId(1)">
+
+                Use Valid ID
+
+            </button>
+
+
+            <button
+                    class="secondary"
+                    onclick="setServiceId(0)">
+
+                Use Invalid ID
+
+            </button>
+
+
+        </section>
+
+
+
+        <!-- ================================================= -->
+        <!-- 4. BindException                                  -->
+        <!-- ================================================= -->
+
+        <section class="card">
+
+
+            <h2>
+
+                <span class="number">
+                    4
+                </span>
+
+                Data Binding Failure
+
+            </h2>
+
+
+            <p class="description">
+
+                Demonstrates a Spring
+
+                <code>
+                    DataBinder
+                </code>
+
+                conversion failure.
+
+                The target property is an Integer,
+                but the request sends text such as
+
+                <strong>
+                    abc
+                </strong>.
+
+            </p>
+
+
+            <div class="expected">
+
+                Expected exception:
+
+                <strong>
+                    BindException
+                </strong>
+
+            </div>
+
+
+            <div class="endpoint">
+
+                POST /api/validation/bind?age=...
+
+            </div>
+
+
+            <label for="bindingAge">
+
+                Age
+
+            </label>
+
+
+            <input
+                    id="bindingAge"
+                    type="text"
+                    value="abc">
+
+
+            <span
+                    id="bindingAgeError"
+                    class="field-error">
+            </span>
+
+
+            <button
+                    class="danger"
+                    onclick="testBinding()">
+
+                Send Request
+
+            </button>
+
+
+            <button
+                    class="success"
+                    onclick="setBindingAge('30')">
+
+                Use Valid Age
+
+            </button>
+
+
+            <button
+                    class="secondary"
+                    onclick="setBindingAge('abc')">
+
+                Use Invalid Age
+
+            </button>
+
+
+        </section>
+
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- Global Exception Handler Result                    -->
+    <!-- ================================================= -->
+
+    <section class="response-panel">
+
+
+        <div class="response-header">
+
+
+            <h2>
+                Global Exception Handler Result
+            </h2>
+
+
+            <div class="badges">
+
+
+                <span
+                        id="httpBadge"
+                        class="badge">
+
+                    HTTP: -
+
+                </span>
+
+
+                <span
+                        id="exceptionBadge"
+                        class="badge">
+
+                    Exception: -
+
+                </span>
+
+
+                <span
+                        id="pathBadge"
+                        class="badge">
+
+                    Path: -
+
+                </span>
+
+
+            </div>
+
+
+        </div>
+
+
+        <div class="response-content">
+
+
+            <h3>
+                Request → Validation → Exception Flow
+            </h3>
+
+
+            <div
+                    id="flow"
+                    class="flow">
+
+Select one of the demonstrations above.
+
+            </div>
+
+
+            <h3>
+                Raw HTTP Response Body
+            </h3>
+
+
+            <pre id="responseBody">
+No request sent.
+            </pre>
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<script>
+
+
+    /*
+     * =====================================================
+     * Common request execution
+     * =====================================================
+     *
+     * All four demonstrations use this function.
+     *
+     * It:
+     *
+     * 1. sends the HTTP request
+     * 2. reads the server response
+     * 3. attempts to parse JSON
+     * 4. displays HTTP status
+     * 5. displays the exception name
+     * 6. displays field validation errors
+     */
+
+
+    async function executeRequest(
+            url,
+            options,
+            flowDescription) {
+
+
+        clearErrors();
+
+
+        document
+            .getElementById(
+                "flow"
+            )
+            .textContent =
+                flowDescription;
+
+
+        try {
+
+
+            const response =
+
+                await fetch(
+                    url,
+                    options
+                );
+
+
+            const text =
+
+                await response.text();
+
+
+            let body;
+
+
+            /*
+             * Error responses from
+             * GlobalExceptionHandler
+             * are JSON.
+             *
+             * Successful responses in this demo
+             * may simply be normal text.
+             */
+            try {
+
+                body =
+                    JSON.parse(
+                        text
+                    );
+
+            }
+            catch (error) {
+
+                body =
+                    text;
+            }
+
+
+            displayResponse(
+                    response,
+                    body,
+                    url
+            );
+
+
+            displayValidationErrors(
+                    body
+            );
+
+
+        }
+        catch (error) {
+
+
+            document
+                .getElementById(
+                    "httpBadge"
+                )
+                .textContent =
+                    "HTTP: Request Failed";
+
+
+            document
+                .getElementById(
+                    "exceptionBadge"
+                )
+                .textContent =
+                    "Exception: Client Error";
+
+
+            document
+                .getElementById(
+                    "responseBody"
+                )
+                .textContent =
+
+                    error.message;
+
+        }
+
+    }
+
+
+
+    /*
+     * =====================================================
+     * Demo 1
+     *
+     * MethodArgumentNotValidException
+     * =====================================================
+     */
+
+
+    async function sendUserRequest() {
+
+
+        /*
+         * Create a JavaScript object
+         * matching the User Java class.
+         */
+        const user = {
+
+
+            username:
+
+                document
+                    .getElementById(
+                        "username"
+                    )
+                    .value,
+
+
+            email:
+
+                document
+                    .getElementById(
+                        "email"
+                    )
+                    .value,
+
+
+            password:
+
+                document
+                    .getElementById(
+                        "password"
+                    )
+                    .value,
+
+
+            age:
+
+                Number(
+
+                    document
+                        .getElementById(
+                            "age"
+                        )
+                        .value
+
+                ),
+
+
+            dateOfBirth:
+
+                document
+                    .getElementById(
+                        "dateOfBirth"
+                    )
+                    .value,
+
+
+            phoneNumber:
+
+                document
+                    .getElementById(
+                        "phoneNumber"
+                    )
+                    .value
+
+        };
+
+
+        await executeRequest(
+
+            "/api/users/register",
+
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body:
+
+                    JSON.stringify(
+                        user
+                    )
+
+            },
+
+            "Browser"
+            + "\n    ↓"
+            + "\nPOST /api/users/register"
+            + "\n    ↓"
+            + "\n@Valid @RequestBody User"
+            + "\n    ↓"
+            + "\nBean Validation"
+            + "\n    ↓"
+            + "\nValidation fails"
+            + "\n    ↓"
+            + "\nMethodArgumentNotValidException"
+            + "\n    ↓"
+            + "\nGlobalExceptionHandler"
+            + "\n    ↓"
+            + "\nhandleValidation(...)"
+            + "\n    ↓"
+            + "\nHTTP 400"
+
+        );
+
+    }
+
+
+
+    /*
+     * Load values that satisfy
+     * the User validation rules.
+     */
+    function loadValidUser() {
+
+
+        document
+            .getElementById(
+                "username"
+            )
+            .value =
+                "steven";
+
+
+        document
+            .getElementById(
+                "email"
+            )
+            .value =
+                "steven@example.com";
+
+
+        document
+            .getElementById(
+                "password"
+            )
+            .value =
+                "Password1";
+
+
+        document
+            .getElementById(
+                "age"
+            )
+            .value =
+                "30";
+
+
+        document
+            .getElementById(
+                "dateOfBirth"
+            )
+            .value =
+                "1996-05-20";
+
+
+        document
+            .getElementById(
+                "phoneNumber"
+            )
+            .value =
+                "+6591234567";
+
+
+        clearErrors();
+
+    }
+
+
+
+    /*
+     * Load values that deliberately
+     * violate multiple validation rules.
+     */
+    function loadInvalidUser() {
+
+
+        document
+            .getElementById(
+                "username"
+            )
+            .value =
+                "ab";
+
+
+        document
+            .getElementById(
+                "email"
+            )
+            .value =
+                "wrong-email";
+
+
+        document
+            .getElementById(
+                "password"
+            )
+            .value =
+                "abc";
+
+
+        document
+            .getElementById(
+                "age"
+            )
+            .value =
+                "15";
+
+
+        document
+            .getElementById(
+                "dateOfBirth"
+            )
+            .value =
+                "2030-01-01";
+
+
+        document
+            .getElementById(
+                "phoneNumber"
+            )
+            .value =
+                "123";
+
+
+        clearErrors();
+
+    }
+
+
+
+    /*
+     * =====================================================
+     * Demo 2
+     *
+     * HandlerMethodValidationException
+     * =====================================================
+     */
+
+
+    async function testControllerValidation() {
+
+
+        const id =
+
+            document
+                .getElementById(
+                    "controllerId"
+                )
+                .value;
+
+
+        await executeRequest(
+
+            "/api/users/"
+            + id,
+
+            {
+
+                method:
+                    "GET"
+
+            },
+
+            "Browser"
+            + "\n    ↓"
+            + "\nGET /api/users/"
+            + id
+            + "\n    ↓"
+            + "\n@PathVariable Long id"
+            + "\n    ↓"
+            + "\n@Min(1)"
+            + "\n    ↓"
+            + "\nController parameter validation fails"
+            + "\n    ↓"
+            + "\nHandlerMethodValidationException"
+            + "\n    ↓"
+            + "\nGlobalExceptionHandler"
+            + "\n    ↓"
+            + "\nhandleMethodValidation(...)"
+            + "\n    ↓"
+            + "\nHTTP 400"
+
+        );
+
+    }
+
+
+
+    function setControllerId(
+            id) {
+
+
+        document
+            .getElementById(
+                "controllerId"
+            )
+            .value =
+                id;
+
+
+        clearErrors();
+
+    }
+
+
+
+    /*
+     * =====================================================
+     * Demo 3
+     *
+     * ConstraintViolationException
+     * =====================================================
+     */
+
+
+    async function testServiceValidation() {
+
+
+        const id =
+
+            document
+                .getElementById(
+                    "serviceId"
+                )
+                .value;
+
+
+        await executeRequest(
+
+            "/api/validation/service/"
+            + id,
+
+            {
+
+                method:
+                    "GET"
+
+            },
+
+            "Browser"
+            + "\n    ↓"
+            + "\nValidationDemoApiController"
+            + "\n    ↓"
+            + "\nValidationDemoService"
+            + "\n    ↓"
+            + "\n@Validated"
+            + "\n    ↓"
+            + "\n@Min(1) Long id"
+            + "\n    ↓"
+            + "\nService method validation fails"
+            + "\n    ↓"
+            + "\nConstraintViolationException"
+            + "\n    ↓"
+            + "\nGlobalExceptionHandler"
+            + "\n    ↓"
+            + "\nhandleConstraint(...)"
+            + "\n    ↓"
+            + "\nHTTP 400"
+
+        );
+
+    }
+
+
+
+    function setServiceId(
+            id) {
+
+
+        document
+            .getElementById(
+                "serviceId"
+            )
+            .value =
+                id;
+
+
+        clearErrors();
+
+    }
+
+
+
+    /*
+     * =====================================================
+     * Demo 4
+     *
+     * BindException
+     * =====================================================
+     */
+
+
+    async function testBinding() {
+
+
+        const age =
+
+            document
+                .getElementById(
+                    "bindingAge"
+                )
+                .value;
+
+
+        await executeRequest(
+
+            "/api/validation/bind"
+            + "?age="
+            + encodeURIComponent(
+                age
+            ),
+
+            {
+
+                method:
+                    "POST"
+
+            },
+
+            "Browser"
+            + "\n    ↓"
+            + "\nPOST /api/validation/bind?age="
+            + age
+            + "\n    ↓"
+            + "\nSpring DataBinder"
+            + "\n    ↓"
+            + "\nString value → Integer age"
+            + "\n    ↓"
+            + "\nType conversion fails"
+            + "\n    ↓"
+            + "\nBindException"
+            + "\n    ↓"
+            + "\nGlobalExceptionHandler"
+            + "\n    ↓"
+            + "\nhandleBindException(...)"
+            + "\n    ↓"
+            + "\nHTTP 400"
+
+        );
+
+    }
+
+
+
+    function setBindingAge(
+            age) {
+
+
+        document
+            .getElementById(
+                "bindingAge"
+            )
+            .value =
+                age;
+
+
+        clearErrors();
+
+    }
+
+
+
+    /*
+     * =====================================================
+     * Display HTTP response
+     * =====================================================
+     */
+
+
+    function displayResponse(
+            response,
+            body,
+            url) {
+
+
+        /*
+         * HTTP status.
+         *
+         * Example:
+         *
+         * HTTP: 400
+         */
+        document
+            .getElementById(
+                "httpBadge"
+            )
+            .textContent =
+
+                "HTTP: "
+                + response.status
+                + " "
+                + response.statusText;
+
+
+
+        /*
+         * GlobalExceptionHandler includes
+         * the exception type in the JSON.
+         *
+         * Example:
+         *
+         * "exception":
+         * "MethodArgumentNotValidException"
+         */
+        document
+            .getElementById(
+                "exceptionBadge"
+            )
+            .textContent =
+
+                "Exception: "
+                + (
+
+                    body
+                    && typeof body === "object"
+                    && body.exception
+
+                        ? body.exception
+
+                        : "None"
+
+                );
+
+
+
+        /*
+         * Display the failing request path.
+         */
+        document
+            .getElementById(
+                "pathBadge"
+            )
+            .textContent =
+
+                "Path: "
+                + (
+
+                    body
+                    && typeof body === "object"
+                    && body.path
+
+                        ? body.path
+
+                        : url
+
+                );
+
+
+
+        /*
+         * Display the complete response.
+         */
+        document
+            .getElementById(
+                "responseBody"
+            )
+            .textContent =
+
+                typeof body === "object"
+
+                    ? JSON.stringify(
+                        body,
+                        null,
+                        2
+                    )
+
+                    : body;
+
+    }
+
+
+
+    /*
+     * =====================================================
+     * Display validation errors beside fields
+     * =====================================================
+     */
+
+
+    function displayValidationErrors(
+            body) {
+
+
+        /*
+         * Successful responses may simply
+         * contain a String.
+         */
+        if (
+            !body
+            ||
+            typeof body !== "object"
+        ) {
+
+            return;
+        }
+
+
+
+        /*
+         * -----------------------------------------
+         * BindException
+         * -----------------------------------------
+         *
+         * The backend field is named:
+         *
+         * age
+         *
+         * but this particular UI input is named:
+         *
+         * bindingAge
+         *
+         * Therefore, handle BindException first
+         * and map the backend "age" error
+         * specifically to bindingAge.
+         */
+        if (
+            body.exception ===
+            "BindException"
+        ) {
+
+
+            if (
+                body.errors
+                &&
+                body.errors.age
+            ) {
+
+
+                document
+                    .getElementById(
+                        "bindingAgeError"
+                    )
+                    .textContent =
+
+                        body
+                            .errors
+                            .age
+                            .join(
+                                " | "
+                            );
+
+
+                document
+                    .getElementById(
+                        "bindingAge"
+                    )
+                    .classList
+                    .add(
+                        "error-input"
+                    );
+
+            }
+
+
+            /*
+             * Stop here.
+             *
+             * Otherwise the generic mapping below
+             * would incorrectly display the age
+             * error beside the registration age.
+             */
+            return;
+
+        }
+
+
+
+        /*
+         * -----------------------------------------
+         * MethodArgumentNotValidException
+         * -----------------------------------------
+         *
+         * GlobalExceptionHandler returns:
+         *
+         * {
+         *     "errors": {
+         *         "email": [...],
+         *         "password": [...]
+         *     }
+         * }
+         *
+         * The JavaScript dynamically maps:
+         *
+         * email
+         *
+         * to:
+         *
+         * emailError
+         */
+        if (
+            body.errors
+        ) {
+
+
+            Object
+                .entries(
+                    body.errors
+                )
+                .forEach(
+
+                    ([field, messages]) => {
+
+
+                        const errorElement =
+
+                            document
+                                .getElementById(
+                                    field
+                                    + "Error"
+                                );
+
+
+                        const inputElement =
+
+                            document
+                                .getElementById(
+                                    field
+                                );
+
+
+                        if (
+                            errorElement
+                        ) {
+
+                            errorElement
+                                .textContent =
+
+                                    messages.join(
+                                        " | "
+                                    );
+
+                        }
+
+
+                        if (
+                            inputElement
+                        ) {
+
+                            inputElement
+                                .classList
+                                .add(
+                                    "error-input"
+                                );
+
+                        }
+
+                    }
+
+                );
+
+        }
+
+
+
+        /*
+         * -----------------------------------------
+         * HandlerMethodValidationException
+         * -----------------------------------------
+         */
+        if (
+            body.exception ===
+            "HandlerMethodValidationException"
+            &&
+            body.violations
+        ) {
+
+
+            const message =
+
+                body
+                    .violations
+                    .join(
+                        " | "
+                    );
+
+
+            document
+                .getElementById(
+                    "controllerIdError"
+                )
+                .textContent =
+                    message;
+
+
+            document
+                .getElementById(
+                    "controllerId"
+                )
+                .classList
+                .add(
+                    "error-input"
+                );
+
+        }
+
+
+
+        /*
+         * -----------------------------------------
+         * ConstraintViolationException
+         * -----------------------------------------
+         */
+        if (
+            body.exception ===
+            "ConstraintViolationException"
+            &&
+            body.violations
+        ) {
+
+
+            const message =
+
+                body
+                    .violations
+                    .join(
+                        " | "
+                    );
+
+
+            document
+                .getElementById(
+                    "serviceIdError"
+                )
+                .textContent =
+                    message;
+
+
+            document
+                .getElementById(
+                    "serviceId"
+                )
+                .classList
+                .add(
+                    "error-input"
+                );
+
+        }
+
+    }
+
+
+
+    /*
+     * =====================================================
+     * Clear field validation errors
+     * =====================================================
+     */
+
+
+    function clearErrors() {
+
+
+        const fields = [
+
+            "username",
+            "email",
+            "password",
+            "age",
+            "dateOfBirth",
+            "phoneNumber",
+
+            "controllerId",
+
+            "serviceId",
+
+            "bindingAge"
+
+        ];
+
+
+        fields.forEach(
+
+            field => {
+
+
+                const input =
+
+                    document
+                        .getElementById(
+                            field
+                        );
+
+
+                if (
+                    input
+                ) {
+
+                    input
+                        .classList
+                        .remove(
+                            "error-input"
+                        );
+
+                }
+
+
+
+                const error =
+
+                    document
+                        .getElementById(
+                            field
+                            + "Error"
+                        );
+
+
+                if (
+                    error
+                ) {
+
+                    error
+                        .textContent =
+                            "";
+
+                }
+
+            }
+
+        );
+
+    }
+
+
+
+    /*
+     * Start the page with invalid data
+     * so students can immediately trigger
+     * validation errors.
+     */
+    loadInvalidUser();
+
+
+</script>
+
+
+</body>
+
+</html>
