@@ -1,721 +1,401 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-            name="viewport"
-            content="width=device-width,
-                     initial-scale=1.0">
-
-    <title>
-        Spring Global Exception Handler Demo
-    </title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Validation Demo</title>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
 
-
         body {
-
             margin: 0;
-
-            font-family:
-                    Arial,
-                    sans-serif;
-
-            background:
-                    #f4f6f8;
-
-            color:
-                    #263238;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #263238;
         }
-
 
         header {
-
-            background:
-                    #263238;
-
-            color:
-                    white;
-
-            padding:
-                    28px 40px;
+            background: #263238;
+            color: white;
+            padding: 28px 40px;
         }
-
 
         header h1 {
-
-            margin:
-                    0 0 8px;
+            margin: 0 0 8px;
         }
-
 
         header p {
-
             margin: 0;
-
-            color:
-                    #cfd8dc;
+            color: #cfd8dc;
         }
-
 
         main {
-
-            max-width:
-                    1250px;
-
-            margin:
-                    30px auto;
-
-            padding:
-                    0 20px;
+            max-width: 1250px;
+            margin: 30px auto;
+            padding: 0 20px;
         }
-
 
         .grid {
-
-            display:
-                    grid;
-
-            grid-template-columns:
-                    repeat(
-                            2,
-                            1fr
-                    );
-
-            gap:
-                    22px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
         }
-
 
         .card {
-
-            background:
-                    white;
-
-            border-radius:
-                    10px;
-
-            padding:
-                    24px;
-
-            box-shadow:
-                    0 2px 10px
-                    rgba(
-                            0,
-                            0,
-                            0,
-                            0.08
-                    );
+            background: white;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
 
-
         .card h2 {
-
             margin-top: 0;
         }
 
-
         .number {
-
-            display:
-                    inline-block;
-
-            margin-right:
-                    8px;
-
-            width:
-                    30px;
-
-            height:
-                    30px;
-
-            line-height:
-                    30px;
-
-            text-align:
-                    center;
-
-            border-radius:
-                    50%;
-
-            color:
-                    white;
-
-            background:
-                    #1976d2;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            margin-right: 8px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            color: white;
+            background: #1976d2;
         }
-
 
         .description {
-
-            color:
-                    #607d8b;
-
-            font-size:
-                    14px;
-
-            line-height:
-                    1.6;
+            color: #607d8b;
+            font-size: 14px;
+            line-height: 1.6;
         }
-
 
         .expected {
-
-            margin:
-                    15px 0;
-
-            padding:
-                    10px;
-
-            border-left:
-                    4px solid #1976d2;
-
-            background:
-                    #e3f2fd;
-
-            font-size:
-                    14px;
+            margin: 15px 0;
+            padding: 10px;
+            border-left: 4px solid #1976d2;
+            background: #e3f2fd;
+            font-size: 14px;
         }
-
 
         .endpoint {
-
-            display:
-                    inline-block;
-
-            margin:
-                    10px 0;
-
-            padding:
-                    6px 9px;
-
-            border-radius:
-                    4px;
-
-            background:
-                    #eceff1;
-
-            font-family:
-                    monospace;
+            display: inline-block;
+            margin: 10px 0 20px;
+            padding: 6px 9px;
+            border-radius: 4px;
+            background: #eceff1;
+            font-family: monospace;
         }
 
+        .form-group {
+            margin-bottom: 18px;
+        }
 
         label {
-
-            display:
-                    block;
-
-            margin-top:
-                    12px;
-
-            margin-bottom:
-                    5px;
-
-            font-weight:
-                    bold;
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
         }
-
 
         input {
-
-            width:
-                    100%;
-
-            padding:
-                    9px;
-
-            border:
-                    1px solid #b0bec5;
-
-            border-radius:
-                    5px;
-
-            font-size:
-                    14px;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #b0bec5;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
         }
 
-
-        input.error-input {
-
-            border:
-                    2px solid #d32f2f;
-
-            background:
-                    #fff8f8;
+        input.invalid {
+            border: 2px solid #d32f2f;
+            background: #fff7f7;
         }
 
-
-        .field-error {
-
-            display:
-                    block;
-
-            min-height:
-                    17px;
-
-            margin-top:
-                    4px;
-
-            color:
-                    #d32f2f;
-
-            font-size:
-                    12px;
-
-            line-height:
-                    1.4;
+        .validation-error {
+            display: block;
+            min-height: 18px;
+            margin-top: 5px;
+            color: #d32f2f;
+            font-size: 13px;
+            line-height: 1.5;
+            font-weight: 600;
         }
 
+        .form-status {
+            display: none;
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .form-status.error {
+            display: block;
+            background: #ffebee;
+            color: #b71c1c;
+        }
+
+        .form-status.success {
+            display: block;
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
 
         button {
-
-            margin:
-                    10px 5px 0 0;
-
-            padding:
-                    10px 15px;
-
-            border:
-                    none;
-
-            border-radius:
-                    5px;
-
-            color:
-                    white;
-
-            background:
-                    #1976d2;
-
-            cursor:
-                    pointer;
+            margin: 10px 5px 0 0;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background: #1976d2;
+            cursor: pointer;
         }
-
 
         button:hover {
-
-            opacity:
-                    0.88;
+            opacity: 0.88;
         }
-
 
         button.danger {
-
-            background:
-                    #c62828;
+            background: #c62828;
         }
-
-
-        button.success {
-
-            background:
-                    #2e7d32;
-        }
-
 
         button.secondary {
-
-            background:
-                    #546e7a;
+            background: #546e7a;
         }
-
 
         .response-panel {
-
-            margin-top:
-                    30px;
-
-            border-radius:
-                    10px;
-
-            overflow:
-                    hidden;
-
-            background:
-                    #212121;
-
-            color:
-                    #eeeeee;
+            margin-top: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #212121;
+            color: #eeeeee;
         }
-
 
         .response-header {
-
-            padding:
-                    18px 22px;
-
-            background:
-                    #37474f;
+            padding: 18px 22px;
+            background: #37474f;
         }
-
 
         .response-header h2 {
-
-            margin:
-                    0 0 10px;
+            margin: 0 0 10px;
         }
-
 
         .badges {
-
-            display:
-                    flex;
-
-            flex-wrap:
-                    wrap;
-
-            gap:
-                    8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-
 
         .badge {
-
-            padding:
-                    5px 10px;
-
-            border-radius:
-                    14px;
-
-            background:
-                    #546e7a;
-
-            font-size:
-                    13px;
+            padding: 5px 10px;
+            border-radius: 14px;
+            background: #546e7a;
+            font-size: 13px;
         }
-
 
         .response-content {
-
-            padding:
-                    22px;
+            padding: 22px;
         }
-
 
         .flow {
-
-            margin-bottom:
-                    22px;
-
-            padding:
-                    15px;
-
-            border:
-                    1px solid #455a64;
-
-            border-radius:
-                    6px;
-
-            font-family:
-                    monospace;
-
-            line-height:
-                    1.8;
-
-            color:
-                    #b2dfdb;
-
-            white-space:
-                    pre-wrap;
+            margin-bottom: 22px;
+            padding: 15px;
+            border: 1px solid #455a64;
+            border-radius: 6px;
+            font-family: monospace;
+            line-height: 1.8;
+            color: #b2dfdb;
+            white-space: pre-wrap;
         }
-
 
         pre {
-
             margin: 0;
-
-            white-space:
-                    pre-wrap;
-
-            word-break:
-                    break-word;
-
-            font-family:
-                    monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: monospace;
         }
-
 
         code {
-
-            font-family:
-                    monospace;
+            font-family: monospace;
         }
 
-
-        @media (
-                max-width: 850px
-        ) {
-
+        @media (max-width: 850px) {
             .grid {
-
-                grid-template-columns:
-                        1fr;
+                grid-template-columns: 1fr;
             }
         }
-
     </style>
-
 </head>
-
 
 <body>
 
-
 <header>
-
-    <h1>
-        Spring Validation & Global Exception Handling
-    </h1>
-
+    <h1>Spring Validation & Global Exception Handling</h1>
     <p>
-        Trigger different validation failures
-        and observe which global exception handler
-        processes the request.
+        Trigger validation failures, show the error directly below each field,
+        and inspect the server response.
     </p>
-
 </header>
-
 
 <main>
 
-
     <div class="grid">
 
-
         <!-- ================================================= -->
-        <!-- 1. MethodArgumentNotValidException                -->
+        <!-- 1. Request Body Validation                         -->
         <!-- ================================================= -->
 
         <section class="card">
 
-
             <h2>
-
-                <span class="number">
-                    1
-                </span>
-
+                <span class="number">1</span>
                 Request Body Validation
-
             </h2>
 
-
             <p class="description">
-
-                Demonstrates Bean Validation on:
-
-                <code>
-                    @Valid @RequestBody User
-                </code>
-
+                Demonstrates Bean Validation on
+                <code>@Valid @RequestBody User</code>.
             </p>
 
-
             <div class="expected">
-
                 Expected exception:
-
-                <strong>
-                    MethodArgumentNotValidException
-                </strong>
-
+                <strong>MethodArgumentNotValidException</strong>
             </div>
-
 
             <div class="endpoint">
-
                 POST /api/users/register
-
             </div>
 
+            <div class="form-group">
+                <label for="username">Username</label>
 
-            <!-- Username -->
+                <input
+                        id="username"
+                        type="text"
+                        value="ab">
 
-            <label for="username">
+                <div
+                        id="usernameError"
+                        class="validation-error">
+                </div>
+            </div>
 
-                Username
+            <div class="form-group">
+                <label for="email">Email</label>
 
-            </label>
+                <input
+                        id="email"
+                        type="text"
+                        value="wrong-email">
 
-            <input
-                    id="username"
-                    type="text"
-                    value="ab">
+                <div
+                        id="emailError"
+                        class="validation-error">
+                </div>
+            </div>
 
-            <span
-                    id="usernameError"
-                    class="field-error">
-            </span>
+            <div class="form-group">
+                <label for="password">Password</label>
 
+                <input
+                        id="password"
+                        type="text"
+                        value="abc">
 
+                <div
+                        id="passwordError"
+                        class="validation-error">
+                </div>
+            </div>
 
-            <!-- Email -->
+            <div class="form-group">
+                <label for="age">Age</label>
 
-            <label for="email">
+                <input
+                        id="age"
+                        type="number"
+                        value="15">
 
-                Email
+                <div
+                        id="ageError"
+                        class="validation-error">
+                </div>
+            </div>
 
-            </label>
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth</label>
 
-            <input
-                    id="email"
-                    type="text"
-                    value="wrong-email">
+                <input
+                        id="dateOfBirth"
+                        type="date"
+                        value="2030-01-01">
 
-            <span
-                    id="emailError"
-                    class="field-error">
-            </span>
+                <div
+                        id="dateOfBirthError"
+                        class="validation-error">
+                </div>
+            </div>
 
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
 
+                <input
+                        id="phoneNumber"
+                        type="text"
+                        value="123">
 
-            <!-- Password -->
-
-            <label for="password">
-
-                Password
-
-            </label>
-
-            <input
-                    id="password"
-                    type="text"
-                    value="abc">
-
-            <span
-                    id="passwordError"
-                    class="field-error">
-            </span>
-
-
-
-            <!-- Age -->
-
-            <label for="age">
-
-                Age
-
-            </label>
-
-            <input
-                    id="age"
-                    type="number"
-                    value="15">
-
-            <span
-                    id="ageError"
-                    class="field-error">
-            </span>
-
-
-
-            <!-- Date of Birth -->
-
-            <label for="dateOfBirth">
-
-                Date of Birth
-
-            </label>
-
-            <input
-                    id="dateOfBirth"
-                    type="date"
-                    value="2030-01-01">
-
-            <span
-                    id="dateOfBirthError"
-                    class="field-error">
-            </span>
-
-
-
-            <!-- Phone Number -->
-
-            <label for="phoneNumber">
-
-                Phone Number
-
-            </label>
-
-            <input
-                    id="phoneNumber"
-                    type="text"
-                    value="123">
-
-            <span
-                    id="phoneNumberError"
-                    class="field-error">
-            </span>
-
-
+                <div
+                        id="phoneNumberError"
+                        class="validation-error">
+                </div>
+            </div>
 
             <button
+                    type="button"
                     class="danger"
                     onclick="sendUserRequest()">
-
                 Send Request
-
             </button>
 
-
             <button
-                    class="success"
+                    type="button"
+                    class="secondary"
                     onclick="loadValidUser()">
-
                 Load Valid Data
-
             </button>
 
-
             <button
+                    type="button"
                     class="secondary"
                     onclick="loadInvalidUser()">
-
                 Load Invalid Data
-
             </button>
 
+            <div
+                    id="userFormStatus"
+                    class="form-status">
+            </div>
 
         </section>
 
 
-
         <!-- ================================================= -->
-        <!-- 2. HandlerMethodValidationException               -->
+        <!-- 2. Controller Parameter Validation                 -->
         <!-- ================================================= -->
 
         <section class="card">
 
-
             <h2>
-
-                <span class="number">
-                    2
-                </span>
-
+                <span class="number">2</span>
                 Controller Parameter Validation
-
             </h2>
 
-
             <p class="description">
-
-                Demonstrates a validation constraint
-                directly declared on a Spring MVC
-                controller method parameter.
-
+                Demonstrates validation directly on a controller method parameter.
             </p>
-
 
             <pre>
 @PathVariable
@@ -727,104 +407,73 @@
 Long id
             </pre>
 
-
             <div class="expected">
-
                 Expected exception:
-
-                <strong>
-                    HandlerMethodValidationException
-                </strong>
-
+                <strong>HandlerMethodValidationException</strong>
             </div>
-
 
             <div class="endpoint">
-
                 GET /api/users/{id}
-
             </div>
 
+            <div class="form-group">
+                <label for="controllerId">User ID</label>
 
-            <label for="controllerId">
+                <input
+                        id="controllerId"
+                        type="number"
+                        value="0">
 
-                User ID
-
-            </label>
-
-
-            <input
-                    id="controllerId"
-                    type="number"
-                    value="0">
-
-
-            <span
-                    id="controllerIdError"
-                    class="field-error">
-            </span>
-
+                <div
+                        id="controllerIdError"
+                        class="validation-error">
+                </div>
+            </div>
 
             <button
+                    type="button"
                     class="danger"
                     onclick="testControllerValidation()">
-
                 Send Request
-
             </button>
 
-
             <button
-                    class="success"
+                    type="button"
+                    class="secondary"
                     onclick="setControllerId(1)">
-
                 Use Valid ID
-
             </button>
 
-
             <button
+                    type="button"
                     class="secondary"
                     onclick="setControllerId(0)">
-
                 Use Invalid ID
-
             </button>
 
+            <div
+                    id="controllerStatus"
+                    class="form-status">
+            </div>
 
         </section>
 
 
-
         <!-- ================================================= -->
-        <!-- 3. ConstraintViolationException                   -->
+        <!-- 3. Service Method Validation                       -->
         <!-- ================================================= -->
 
         <section class="card">
 
-
             <h2>
-
-                <span class="number">
-                    3
-                </span>
-
+                <span class="number">3</span>
                 Service Method Validation
-
             </h2>
 
-
             <p class="description">
-
-                Demonstrates method validation
-                on a Spring service annotated with
-
-                <code>
-                    @Validated
-                </code>.
-
+                Demonstrates method validation on a Spring service using
+                <code>@Validated</code>.
             </p>
-
 
             <pre>
 @Service
@@ -839,182 +488,125 @@ public class ValidationDemoService {
 }
             </pre>
 
-
             <div class="expected">
-
                 Expected exception:
-
-                <strong>
-                    ConstraintViolationException
-                </strong>
-
+                <strong>ConstraintViolationException</strong>
             </div>
-
 
             <div class="endpoint">
-
                 GET /api/validation/service/{id}
-
             </div>
 
+            <div class="form-group">
+                <label for="serviceId">Service User ID</label>
 
-            <label for="serviceId">
+                <input
+                        id="serviceId"
+                        type="number"
+                        value="0">
 
-                Service User ID
-
-            </label>
-
-
-            <input
-                    id="serviceId"
-                    type="number"
-                    value="0">
-
-
-            <span
-                    id="serviceIdError"
-                    class="field-error">
-            </span>
-
+                <div
+                        id="serviceIdError"
+                        class="validation-error">
+                </div>
+            </div>
 
             <button
+                    type="button"
                     class="danger"
                     onclick="testServiceValidation()">
-
                 Send Request
-
             </button>
 
-
             <button
-                    class="success"
+                    type="button"
+                    class="secondary"
                     onclick="setServiceId(1)">
-
                 Use Valid ID
-
             </button>
 
-
             <button
+                    type="button"
                     class="secondary"
                     onclick="setServiceId(0)">
-
                 Use Invalid ID
-
             </button>
 
+            <div
+                    id="serviceStatus"
+                    class="form-status">
+            </div>
 
         </section>
 
 
-
         <!-- ================================================= -->
-        <!-- 4. BindException                                  -->
+        <!-- 4. BindException                                   -->
         <!-- ================================================= -->
 
         <section class="card">
 
-
             <h2>
-
-                <span class="number">
-                    4
-                </span>
-
+                <span class="number">4</span>
                 Data Binding Failure
-
             </h2>
 
-
             <p class="description">
-
-                Demonstrates a Spring
-
-                <code>
-                    DataBinder
-                </code>
-
-                conversion failure.
-
-                The target property is an Integer,
-                but the request sends text such as
-
-                <strong>
-                    abc
-                </strong>.
-
+                Demonstrates a Spring <code>DataBinder</code> conversion failure.
             </p>
 
-
             <div class="expected">
-
                 Expected exception:
-
-                <strong>
-                    BindException
-                </strong>
-
+                <strong>BindException</strong>
             </div>
-
 
             <div class="endpoint">
-
                 POST /api/validation/bind?age=...
-
             </div>
 
+            <div class="form-group">
+                <label for="bindingAge">Age</label>
 
-            <label for="bindingAge">
+                <input
+                        id="bindingAge"
+                        type="text"
+                        value="abc">
 
-                Age
-
-            </label>
-
-
-            <input
-                    id="bindingAge"
-                    type="text"
-                    value="abc">
-
-
-            <span
-                    id="bindingAgeError"
-                    class="field-error">
-            </span>
-
+                <div
+                        id="bindingAgeError"
+                        class="validation-error">
+                </div>
+            </div>
 
             <button
+                    type="button"
                     class="danger"
                     onclick="testBinding()">
-
                 Send Request
-
             </button>
 
-
             <button
-                    class="success"
+                    type="button"
+                    class="secondary"
                     onclick="setBindingAge('30')">
-
                 Use Valid Age
-
             </button>
 
-
             <button
+                    type="button"
                     class="secondary"
                     onclick="setBindingAge('abc')">
-
                 Use Invalid Age
-
             </button>
 
+            <div
+                    id="bindingStatus"
+                    class="form-status">
+            </div>
 
         </section>
 
-
     </div>
-
 
 
     <!-- ================================================= -->
@@ -1023,65 +615,47 @@ public class ValidationDemoService {
 
     <section class="response-panel">
 
-
         <div class="response-header">
-
 
             <h2>
                 Global Exception Handler Result
             </h2>
 
-
             <div class="badges">
-
 
                 <span
                         id="httpBadge"
                         class="badge">
-
                     HTTP: -
-
                 </span>
-
 
                 <span
                         id="exceptionBadge"
                         class="badge">
-
                     Exception: -
-
                 </span>
-
 
                 <span
                         id="pathBadge"
                         class="badge">
-
                     Path: -
-
                 </span>
 
-
             </div>
-
 
         </div>
 
 
         <div class="response-content">
 
-
             <h3>
                 Request → Validation → Exception Flow
             </h3>
 
-
             <div
                     id="flow"
                     class="flow">
-
 Select one of the demonstrations above.
-
             </div>
 
 
@@ -1089,142 +663,218 @@ Select one of the demonstrations above.
                 Raw HTTP Response Body
             </h3>
 
-
             <pre id="responseBody">
 No request sent.
             </pre>
 
-
         </div>
 
-
     </section>
-
 
 </main>
 
 
-
 <script>
+
+    const USER_FIELDS = [
+        "username",
+        "email",
+        "password",
+        "age",
+        "dateOfBirth",
+        "phoneNumber"
+    ];
 
 
     /*
      * =====================================================
-     * Common request execution
+     * Demo 1
+     *
+     * Request Body Validation
      * =====================================================
-     *
-     * All four demonstrations use this function.
-     *
-     * It:
-     *
-     * 1. sends the HTTP request
-     * 2. reads the server response
-     * 3. attempts to parse JSON
-     * 4. displays HTTP status
-     * 5. displays the exception name
-     * 6. displays field validation errors
      */
 
+    async function sendUserRequest() {
 
-    async function executeRequest(
-            url,
-            options,
-            flowDescription) {
+        clearUserErrors();
+        clearUserFormStatus();
 
+        const user = {
 
-        clearErrors();
+            username:
+                document
+                    .getElementById("username")
+                    .value,
+
+            email:
+                document
+                    .getElementById("email")
+                    .value,
+
+            password:
+                document
+                    .getElementById("password")
+                    .value,
+
+            age:
+                Number(
+                    document
+                        .getElementById("age")
+                        .value
+                ),
+
+            dateOfBirth:
+                document
+                    .getElementById("dateOfBirth")
+                    .value,
+
+            phoneNumber:
+                document
+                    .getElementById("phoneNumber")
+                    .value
+        };
 
 
         document
-            .getElementById(
-                "flow"
-            )
+            .getElementById("flow")
             .textContent =
-                flowDescription;
+
+                "Browser"
+                + "\n    ↓"
+                + "\nPOST /api/users/register"
+                + "\n    ↓"
+                + "\n@Valid @RequestBody User"
+                + "\n    ↓"
+                + "\nBean Validation"
+                + "\n    ↓"
+                + "\nMethodArgumentNotValidException"
+                + "\n    ↓"
+                + "\nGlobalExceptionHandler"
+                + "\n    ↓"
+                + "\nhandleValidation(...)";
 
 
         try {
 
-
             const response =
 
                 await fetch(
-                    url,
-                    options
+
+                    "/api/users/register",
+
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(user)
+                    }
+
                 );
 
 
-            const text =
-
-                await response.text();
-
-
-            let body;
-
-
-            /*
-             * Error responses from
-             * GlobalExceptionHandler
-             * are JSON.
-             *
-             * Successful responses in this demo
-             * may simply be normal text.
-             */
-            try {
-
-                body =
-                    JSON.parse(
-                        text
-                    );
-
-            }
-            catch (error) {
-
-                body =
-                    text;
-            }
+            const body =
+                await readResponse(response);
 
 
             displayResponse(
-                    response,
-                    body,
-                    url
+
+                response,
+                body,
+                "/api/users/register"
+
             );
 
 
-            displayValidationErrors(
-                    body
+            /*
+             * This extraction is deliberately robust.
+             *
+             * It supports BOTH:
+             *
+             * 1. GlobalExceptionHandler JSON:
+             *
+             * {
+             *   "errors": {
+             *      "email": ["Must be valid"]
+             *   }
+             * }
+             *
+             * AND
+             *
+             * 2. A BindingResult controller response:
+             *
+             * [email: Must be valid, ...]
+             *
+             * Therefore inline errors are still shown
+             * even if /register currently returns the
+             * older BindingResult response.
+             */
+            const fieldErrors =
+                extractUserFieldErrors(body);
+
+
+            if (
+                Object.keys(fieldErrors).length > 0
+            ) {
+
+                showUserFieldErrors(
+                    fieldErrors
+                );
+
+                showUserFormStatus(
+                    "Please correct the highlighted fields.",
+                    true
+                );
+
+                return;
+            }
+
+
+            /*
+             * Request failed but no field-level error
+             * could be extracted.
+             */
+            if (
+                !response.ok
+            ) {
+
+                showUserFormStatus(
+
+                    "The request failed, but no field-level "
+                    + "validation errors could be mapped. "
+                    + "Check the raw response below.",
+
+                    true
+                );
+
+                return;
+            }
+
+
+            /*
+             * Successful request.
+             *
+             * No green border is shown.
+             */
+            showUserFormStatus(
+                "Request accepted.",
+                false
             );
 
 
         }
         catch (error) {
 
+            displayClientError(error);
 
-            document
-                .getElementById(
-                    "httpBadge"
-                )
-                .textContent =
-                    "HTTP: Request Failed";
-
-
-            document
-                .getElementById(
-                    "exceptionBadge"
-                )
-                .textContent =
-                    "Exception: Client Error";
-
-
-            document
-                .getElementById(
-                    "responseBody"
-                )
-                .textContent =
-
-                    error.message;
-
+            showUserFormStatus(
+                error.message,
+                true
+            );
         }
 
     }
@@ -1232,126 +882,279 @@ No request sent.
 
 
     /*
-     * =====================================================
-     * Demo 1
-     *
-     * MethodArgumentNotValidException
-     * =====================================================
+     * Extract field errors from different
+     * possible server response formats.
      */
+    function extractUserFieldErrors(
+            body) {
 
 
-    async function sendUserRequest() {
+        const result = {};
 
 
         /*
-         * Create a JavaScript object
-         * matching the User Java class.
+         * -----------------------------------------
+         * Format 1:
+         *
+         * GlobalExceptionHandler
+         *
+         * {
+         *     "errors": {
+         *         "email": [...],
+         *         "password": [...]
+         *     }
+         * }
+         * -----------------------------------------
          */
-        const user = {
+        if (
+            body
+            &&
+            typeof body === "object"
+            &&
+            !Array.isArray(body)
+            &&
+            body.errors
+            &&
+            typeof body.errors === "object"
+        ) {
+
+            Object
+                .entries(body.errors)
+                .forEach(
+
+                    ([field, messages]) => {
+
+                        if (
+                            USER_FIELDS.includes(field)
+                        ) {
+
+                            result[field] =
+                                normalizeMessages(messages);
+                        }
+
+                    }
+
+                );
 
 
-            username:
-
-                document
-                    .getElementById(
-                        "username"
-                    )
-                    .value,
+            return result;
+        }
 
 
-            email:
+        /*
+         * -----------------------------------------
+         * Format 2:
+         *
+         * JSON array:
+         *
+         * [
+         *   "email: Must be valid",
+         *   "age: Age must be at least 18"
+         * ]
+         * -----------------------------------------
+         */
+        if (
+            Array.isArray(body)
+        ) {
 
-                document
-                    .getElementById(
-                        "email"
-                    )
-                    .value,
+            body.forEach(
 
+                item => {
 
-            password:
+                    addFieldMessageFromText(
+                        result,
+                        String(item)
+                    );
 
-                document
-                    .getElementById(
-                        "password"
-                    )
-                    .value,
+                }
 
-
-            age:
-
-                Number(
-
-                    document
-                        .getElementById(
-                            "age"
-                        )
-                        .value
-
-                ),
-
-
-            dateOfBirth:
-
-                document
-                    .getElementById(
-                        "dateOfBirth"
-                    )
-                    .value,
+            );
 
 
-            phoneNumber:
-
-                document
-                    .getElementById(
-                        "phoneNumber"
-                    )
-                    .value
-
-        };
+            return result;
+        }
 
 
-        await executeRequest(
+        /*
+         * -----------------------------------------
+         * Format 3:
+         *
+         * Plain text from BindingResult:
+         *
+         * [email: Must be valid,
+         *  password: Too short,
+         *  password: Needs uppercase]
+         * -----------------------------------------
+         */
+        if (
+            typeof body === "string"
+        ) {
 
-            "/api/users/register",
+            addAllFieldMessagesFromText(
+                result,
+                body
+            );
+        }
 
-            {
 
-                method:
-                    "POST",
+        return result;
 
-                headers: {
+    }
 
-                    "Content-Type":
-                        "application/json"
 
-                },
 
-                body:
+    function normalizeMessages(
+            messages) {
 
-                    JSON.stringify(
-                        user
-                    )
 
-            },
+        if (
+            Array.isArray(messages)
+        ) {
 
-            "Browser"
-            + "\n    ↓"
-            + "\nPOST /api/users/register"
-            + "\n    ↓"
-            + "\n@Valid @RequestBody User"
-            + "\n    ↓"
-            + "\nBean Validation"
-            + "\n    ↓"
-            + "\nValidation fails"
-            + "\n    ↓"
-            + "\nMethodArgumentNotValidException"
-            + "\n    ↓"
-            + "\nGlobalExceptionHandler"
-            + "\n    ↓"
-            + "\nhandleValidation(...)"
-            + "\n    ↓"
-            + "\nHTTP 400"
+            return messages.map(
+                message =>
+                    String(message)
+            );
+        }
 
+
+        return [
+            String(messages)
+        ];
+
+    }
+
+
+
+    /*
+     * Parse all known field messages from
+     * a plain-text response.
+     *
+     * This handles repeated fields too.
+     *
+     * Example:
+     *
+     * password: message 1,
+     * password: message 2
+     */
+    function addAllFieldMessagesFromText(
+            target,
+            text) {
+
+
+        const fieldPattern =
+            USER_FIELDS.join("|");
+
+
+        const regex =
+            new RegExp(
+
+                "(?:^|[\\[,])\\s*"
+                + "("
+                + fieldPattern
+                + ")"
+                + "\\s*:\\s*"
+                + "([^,\\]]+)",
+
+                "g"
+
+            );
+
+
+        let match;
+
+
+        while (
+            (
+                match =
+                    regex.exec(text)
+            )
+            !== null
+        ) {
+
+            addFieldMessage(
+
+                target,
+
+                match[1],
+
+                match[2].trim()
+
+            );
+        }
+
+    }
+
+
+
+    /*
+     * Parse one "field: message" value.
+     */
+    function addFieldMessageFromText(
+            target,
+            text) {
+
+
+        const separator =
+            text.indexOf(":");
+
+
+        if (
+            separator < 0
+        ) {
+
+            return;
+        }
+
+
+        const field =
+            text
+                .substring(
+                    0,
+                    separator
+                )
+                .trim();
+
+
+        const message =
+            text
+                .substring(
+                    separator + 1
+                )
+                .trim();
+
+
+        if (
+            USER_FIELDS.includes(field)
+        ) {
+
+            addFieldMessage(
+                target,
+                field,
+                message
+            );
+        }
+
+    }
+
+
+
+    function addFieldMessage(
+            target,
+            field,
+            message) {
+
+
+        if (
+            !target[field]
+        ) {
+
+            target[field] = [];
+        }
+
+
+        target[field].push(
+            message
         );
 
     }
@@ -1359,123 +1162,212 @@ No request sent.
 
 
     /*
-     * Load values that satisfy
-     * the User validation rules.
+     * Show the extracted validation messages
+     * directly below each matching field.
      */
-    function loadValidUser() {
+    function showUserFieldErrors(
+            errors) {
 
 
-        document
-            .getElementById(
-                "username"
-            )
-            .value =
-                "steven";
+        Object
+            .entries(errors)
+            .forEach(
+
+                ([fieldName, messages]) => {
 
 
-        document
-            .getElementById(
-                "email"
-            )
-            .value =
-                "steven@example.com";
+                    const input =
+                        document
+                            .getElementById(
+                                fieldName
+                            );
 
 
-        document
-            .getElementById(
-                "password"
-            )
-            .value =
-                "Password1";
+                    const errorDisplay =
+                        document
+                            .getElementById(
+                                fieldName
+                                + "Error"
+                            );
 
 
-        document
-            .getElementById(
-                "age"
-            )
-            .value =
-                "30";
+                    if (
+                        input
+                    ) {
+
+                        input
+                            .classList
+                            .add("invalid");
 
 
-        document
-            .getElementById(
-                "dateOfBirth"
-            )
-            .value =
-                "1996-05-20";
+                        input
+                            .setAttribute(
+                                "aria-invalid",
+                                "true"
+                            );
+                    }
 
 
-        document
-            .getElementById(
-                "phoneNumber"
-            )
-            .value =
-                "+6591234567";
+                    if (
+                        errorDisplay
+                    ) {
 
+                        errorDisplay
+                            .textContent =
 
-        clearErrors();
+                                normalizeMessages(
+                                    messages
+                                )
+                                    .join(" | ");
+                    }
+
+                }
+
+            );
 
     }
 
 
 
+    function clearUserErrors() {
+
+        USER_FIELDS.forEach(
+
+            field =>
+                clearFieldError(field)
+
+        );
+    }
+
+
+
+    function loadValidUser() {
+
+        document
+            .getElementById("username")
+            .value =
+                "steven";
+
+        document
+            .getElementById("email")
+            .value =
+                "steven@example.com";
+
+        document
+            .getElementById("password")
+            .value =
+                "Password1";
+
+        document
+            .getElementById("age")
+            .value =
+                "30";
+
+        document
+            .getElementById("dateOfBirth")
+            .value =
+                "1996-05-20";
+
+        document
+            .getElementById("phoneNumber")
+            .value =
+                "+6591234567";
+
+
+        clearUserErrors();
+        clearUserFormStatus();
+    }
+
+
+
     /*
-     * Load values that deliberately
-     * violate multiple validation rules.
+     * Load invalid example values only.
+     *
+     * This function does NOT send a request.
+     *
+     * Students must click "Send Request"
+     * separately to trigger Spring validation.
      */
     function loadInvalidUser() {
 
-
         document
-            .getElementById(
-                "username"
-            )
+            .getElementById("username")
             .value =
                 "ab";
 
-
         document
-            .getElementById(
-                "email"
-            )
+            .getElementById("email")
             .value =
                 "wrong-email";
 
-
         document
-            .getElementById(
-                "password"
-            )
+            .getElementById("password")
             .value =
                 "abc";
 
-
         document
-            .getElementById(
-                "age"
-            )
+            .getElementById("age")
             .value =
                 "15";
 
-
         document
-            .getElementById(
-                "dateOfBirth"
-            )
+            .getElementById("dateOfBirth")
             .value =
                 "2030-01-01";
 
-
         document
-            .getElementById(
-                "phoneNumber"
-            )
+            .getElementById("phoneNumber")
             .value =
                 "123";
 
 
-        clearErrors();
+        clearUserErrors();
+        clearUserFormStatus();
+    }
 
+
+
+    function showUserFormStatus(
+            message,
+            isError) {
+
+
+        const status =
+            document
+                .getElementById(
+                    "userFormStatus"
+                );
+
+
+        status.textContent =
+            message;
+
+
+        status.className =
+
+            isError
+                ? "form-status error"
+                : "form-status success";
+
+    }
+
+
+
+    function clearUserFormStatus() {
+
+        const status =
+            document
+                .getElementById(
+                    "userFormStatus"
+                );
+
+
+        status.textContent =
+            "";
+
+
+        status.className =
+            "form-status";
     }
 
 
@@ -1488,12 +1380,18 @@ No request sent.
      * =====================================================
      */
 
-
     async function testControllerValidation() {
+
+        clearFieldError(
+            "controllerId"
+        );
+
+        clearSectionStatus(
+            "controllerStatus"
+        );
 
 
         const id =
-
             document
                 .getElementById(
                     "controllerId"
@@ -1501,38 +1399,94 @@ No request sent.
                 .value;
 
 
-        await executeRequest(
+        document
+            .getElementById("flow")
+            .textContent =
 
-            "/api/users/"
-            + id,
+                "Browser"
+                + "\n    ↓"
+                + "\nGET /api/users/"
+                + id
+                + "\n    ↓"
+                + "\n@PathVariable"
+                + "\n    ↓"
+                + "\n@Min(1)"
+                + "\n    ↓"
+                + "\nHandlerMethodValidationException"
+                + "\n    ↓"
+                + "\nGlobalExceptionHandler"
+                + "\n    ↓"
+                + "\nhandleMethodValidation(...)";
 
-            {
 
-                method:
-                    "GET"
+        try {
 
-            },
+            const response =
 
-            "Browser"
-            + "\n    ↓"
-            + "\nGET /api/users/"
-            + id
-            + "\n    ↓"
-            + "\n@PathVariable Long id"
-            + "\n    ↓"
-            + "\n@Min(1)"
-            + "\n    ↓"
-            + "\nController parameter validation fails"
-            + "\n    ↓"
-            + "\nHandlerMethodValidationException"
-            + "\n    ↓"
-            + "\nGlobalExceptionHandler"
-            + "\n    ↓"
-            + "\nhandleMethodValidation(...)"
-            + "\n    ↓"
-            + "\nHTTP 400"
+                await fetch(
+                    "/api/users/"
+                    + id
+                );
 
-        );
+
+            const body =
+                await readResponse(
+                    response
+                );
+
+
+            displayResponse(
+
+                response,
+                body,
+                "/api/users/"
+                + id
+
+            );
+
+
+            if (
+                !response.ok
+                &&
+                body
+                &&
+                typeof body === "object"
+                &&
+                body.violations
+            ) {
+
+                showSingleFieldError(
+
+                    "controllerId",
+
+                    body.violations
+
+                );
+
+                return;
+            }
+
+
+            if (
+                response.ok
+            ) {
+
+                showSectionSuccess(
+
+                    "controllerStatus",
+
+                    typeof body === "string"
+                        ? body
+                        : "Controller parameter validation passed."
+
+                );
+            }
+
+        }
+        catch (error) {
+
+            displayClientError(error);
+        }
 
     }
 
@@ -1540,7 +1494,6 @@ No request sent.
 
     function setControllerId(
             id) {
-
 
         document
             .getElementById(
@@ -1550,8 +1503,13 @@ No request sent.
                 id;
 
 
-        clearErrors();
+        clearFieldError(
+            "controllerId"
+        );
 
+        clearSectionStatus(
+            "controllerStatus"
+        );
     }
 
 
@@ -1564,12 +1522,18 @@ No request sent.
      * =====================================================
      */
 
-
     async function testServiceValidation() {
+
+        clearFieldError(
+            "serviceId"
+        );
+
+        clearSectionStatus(
+            "serviceStatus"
+        );
 
 
         const id =
-
             document
                 .getElementById(
                     "serviceId"
@@ -1577,39 +1541,95 @@ No request sent.
                 .value;
 
 
-        await executeRequest(
+        document
+            .getElementById("flow")
+            .textContent =
 
-            "/api/validation/service/"
-            + id,
+                "Browser"
+                + "\n    ↓"
+                + "\nValidationDemoApiController"
+                + "\n    ↓"
+                + "\nValidationDemoService"
+                + "\n    ↓"
+                + "\n@Validated"
+                + "\n    ↓"
+                + "\n@Min(1)"
+                + "\n    ↓"
+                + "\nConstraintViolationException"
+                + "\n    ↓"
+                + "\nGlobalExceptionHandler"
+                + "\n    ↓"
+                + "\nhandleConstraint(...)";
 
-            {
 
-                method:
-                    "GET"
+        try {
 
-            },
+            const response =
 
-            "Browser"
-            + "\n    ↓"
-            + "\nValidationDemoApiController"
-            + "\n    ↓"
-            + "\nValidationDemoService"
-            + "\n    ↓"
-            + "\n@Validated"
-            + "\n    ↓"
-            + "\n@Min(1) Long id"
-            + "\n    ↓"
-            + "\nService method validation fails"
-            + "\n    ↓"
-            + "\nConstraintViolationException"
-            + "\n    ↓"
-            + "\nGlobalExceptionHandler"
-            + "\n    ↓"
-            + "\nhandleConstraint(...)"
-            + "\n    ↓"
-            + "\nHTTP 400"
+                await fetch(
+                    "/api/validation/service/"
+                    + id
+                );
 
-        );
+
+            const body =
+                await readResponse(
+                    response
+                );
+
+
+            displayResponse(
+
+                response,
+                body,
+                "/api/validation/service/"
+                + id
+
+            );
+
+
+            if (
+                !response.ok
+                &&
+                body
+                &&
+                typeof body === "object"
+                &&
+                body.violations
+            ) {
+
+                showSingleFieldError(
+
+                    "serviceId",
+
+                    body.violations
+
+                );
+
+                return;
+            }
+
+
+            if (
+                response.ok
+            ) {
+
+                showSectionSuccess(
+
+                    "serviceStatus",
+
+                    typeof body === "string"
+                        ? body
+                        : "Service method validation passed."
+
+                );
+            }
+
+        }
+        catch (error) {
+
+            displayClientError(error);
+        }
 
     }
 
@@ -1617,7 +1637,6 @@ No request sent.
 
     function setServiceId(
             id) {
-
 
         document
             .getElementById(
@@ -1627,8 +1646,13 @@ No request sent.
                 id;
 
 
-        clearErrors();
+        clearFieldError(
+            "serviceId"
+        );
 
+        clearSectionStatus(
+            "serviceStatus"
+        );
     }
 
 
@@ -1641,12 +1665,18 @@ No request sent.
      * =====================================================
      */
 
-
     async function testBinding() {
+
+        clearFieldError(
+            "bindingAge"
+        );
+
+        clearSectionStatus(
+            "bindingStatus"
+        );
 
 
         const age =
-
             document
                 .getElementById(
                     "bindingAge"
@@ -1654,41 +1684,102 @@ No request sent.
                 .value;
 
 
-        await executeRequest(
+        document
+            .getElementById("flow")
+            .textContent =
 
-            "/api/validation/bind"
-            + "?age="
-            + encodeURIComponent(
-                age
-            ),
+                "Browser"
+                + "\n    ↓"
+                + "\nPOST /api/validation/bind?age="
+                + age
+                + "\n    ↓"
+                + "\nSpring DataBinder"
+                + "\n    ↓"
+                + "\nString → Integer conversion"
+                + "\n    ↓"
+                + "\nBindException"
+                + "\n    ↓"
+                + "\nGlobalExceptionHandler"
+                + "\n    ↓"
+                + "\nhandleBindException(...)";
 
-            {
 
-                method:
-                    "POST"
+        try {
 
-            },
+            const response =
 
-            "Browser"
-            + "\n    ↓"
-            + "\nPOST /api/validation/bind?age="
-            + age
-            + "\n    ↓"
-            + "\nSpring DataBinder"
-            + "\n    ↓"
-            + "\nString value → Integer age"
-            + "\n    ↓"
-            + "\nType conversion fails"
-            + "\n    ↓"
-            + "\nBindException"
-            + "\n    ↓"
-            + "\nGlobalExceptionHandler"
-            + "\n    ↓"
-            + "\nhandleBindException(...)"
-            + "\n    ↓"
-            + "\nHTTP 400"
+                await fetch(
 
-        );
+                    "/api/validation/bind"
+                    + "?age="
+                    + encodeURIComponent(age),
+
+                    {
+                        method: "POST"
+                    }
+
+                );
+
+
+            const body =
+                await readResponse(
+                    response
+                );
+
+
+            displayResponse(
+
+                response,
+                body,
+                "/api/validation/bind"
+
+            );
+
+
+            if (
+                !response.ok
+                &&
+                body
+                &&
+                typeof body === "object"
+                &&
+                body.errors
+                &&
+                body.errors.age
+            ) {
+
+                showSingleFieldError(
+
+                    "bindingAge",
+
+                    body.errors.age
+
+                );
+
+                return;
+            }
+
+
+            if (
+                response.ok
+            ) {
+
+                showSectionSuccess(
+
+                    "bindingStatus",
+
+                    typeof body === "string"
+                        ? body
+                        : "Data binding succeeded."
+
+                );
+            }
+
+        }
+        catch (error) {
+
+            displayClientError(error);
+        }
 
     }
 
@@ -1696,7 +1787,6 @@ No request sent.
 
     function setBindingAge(
             age) {
-
 
         document
             .getElementById(
@@ -1706,7 +1796,120 @@ No request sent.
                 age;
 
 
-        clearErrors();
+        clearFieldError(
+            "bindingAge"
+        );
+
+        clearSectionStatus(
+            "bindingStatus"
+        );
+    }
+
+
+
+    /*
+     * =====================================================
+     * Shared field error functions
+     * =====================================================
+     */
+
+    function showSingleFieldError(
+            fieldId,
+            messages) {
+
+
+        const input =
+            document
+                .getElementById(
+                    fieldId
+                );
+
+
+        const errorDisplay =
+            document
+                .getElementById(
+                    fieldId
+                    + "Error"
+                );
+
+
+        if (
+            input
+        ) {
+
+            input
+                .classList
+                .add("invalid");
+
+
+            input
+                .setAttribute(
+                    "aria-invalid",
+                    "true"
+                );
+        }
+
+
+        if (
+            errorDisplay
+        ) {
+
+            errorDisplay
+                .textContent =
+
+                    normalizeMessages(
+                        messages
+                    )
+                        .join(" | ");
+        }
+
+    }
+
+
+
+    function clearFieldError(
+            fieldId) {
+
+
+        const input =
+            document
+                .getElementById(
+                    fieldId
+                );
+
+
+        const errorDisplay =
+            document
+                .getElementById(
+                    fieldId
+                    + "Error"
+                );
+
+
+        if (
+            input
+        ) {
+
+            input
+                .classList
+                .remove("invalid");
+
+
+            input
+                .removeAttribute(
+                    "aria-invalid"
+                );
+        }
+
+
+        if (
+            errorDisplay
+        ) {
+
+            errorDisplay
+                .textContent =
+                    "";
+        }
 
     }
 
@@ -1714,9 +1917,97 @@ No request sent.
 
     /*
      * =====================================================
-     * Display HTTP response
+     * Section success messages
      * =====================================================
      */
+
+    function showSectionSuccess(
+            elementId,
+            message) {
+
+
+        const status =
+            document
+                .getElementById(
+                    elementId
+                );
+
+
+        if (
+            !status
+        ) {
+
+            return;
+        }
+
+
+        status.textContent =
+            message;
+
+
+        status.className =
+            "form-status success";
+    }
+
+
+
+    function clearSectionStatus(
+            elementId) {
+
+
+        const status =
+            document
+                .getElementById(
+                    elementId
+                );
+
+
+        if (
+            !status
+        ) {
+
+            return;
+        }
+
+
+        status.textContent =
+            "";
+
+
+        status.className =
+            "form-status";
+    }
+
+
+
+    /*
+     * =====================================================
+     * HTTP response helpers
+     * =====================================================
+     */
+
+    async function readResponse(
+            response) {
+
+
+        const text =
+            await response.text();
+
+
+        try {
+
+            return JSON.parse(
+                text
+            );
+
+        }
+        catch (error) {
+
+            return text;
+        }
+
+    }
+
 
 
     function displayResponse(
@@ -1725,13 +2016,6 @@ No request sent.
             url) {
 
 
-        /*
-         * HTTP status.
-         *
-         * Example:
-         *
-         * HTTP: 400
-         */
         document
             .getElementById(
                 "httpBadge"
@@ -1744,16 +2028,6 @@ No request sent.
                 + response.statusText;
 
 
-
-        /*
-         * GlobalExceptionHandler includes
-         * the exception type in the JSON.
-         *
-         * Example:
-         *
-         * "exception":
-         * "MethodArgumentNotValidException"
-         */
         document
             .getElementById(
                 "exceptionBadge"
@@ -1764,8 +2038,12 @@ No request sent.
                 + (
 
                     body
-                    && typeof body === "object"
-                    && body.exception
+                    &&
+                    typeof body === "object"
+                    &&
+                    !Array.isArray(body)
+                    &&
+                    body.exception
 
                         ? body.exception
 
@@ -1774,10 +2052,6 @@ No request sent.
                 );
 
 
-
-        /*
-         * Display the failing request path.
-         */
         document
             .getElementById(
                 "pathBadge"
@@ -1788,8 +2062,12 @@ No request sent.
                 + (
 
                     body
-                    && typeof body === "object"
-                    && body.path
+                    &&
+                    typeof body === "object"
+                    &&
+                    !Array.isArray(body)
+                    &&
+                    body.path
 
                         ? body.path
 
@@ -1798,10 +2076,6 @@ No request sent.
                 );
 
 
-
-        /*
-         * Display the complete response.
-         */
         document
             .getElementById(
                 "responseBody"
@@ -1822,369 +2096,51 @@ No request sent.
 
 
 
-    /*
-     * =====================================================
-     * Display validation errors beside fields
-     * =====================================================
-     */
-
-
-    function displayValidationErrors(
-            body) {
-
-
-        /*
-         * Successful responses may simply
-         * contain a String.
-         */
-        if (
-            !body
-            ||
-            typeof body !== "object"
-        ) {
-
-            return;
-        }
-
-
-
-        /*
-         * -----------------------------------------
-         * BindException
-         * -----------------------------------------
-         *
-         * The backend field is named:
-         *
-         * age
-         *
-         * but this particular UI input is named:
-         *
-         * bindingAge
-         *
-         * Therefore, handle BindException first
-         * and map the backend "age" error
-         * specifically to bindingAge.
-         */
-        if (
-            body.exception ===
-            "BindException"
-        ) {
-
-
-            if (
-                body.errors
-                &&
-                body.errors.age
-            ) {
-
-
-                document
-                    .getElementById(
-                        "bindingAgeError"
-                    )
-                    .textContent =
-
-                        body
-                            .errors
-                            .age
-                            .join(
-                                " | "
-                            );
-
-
-                document
-                    .getElementById(
-                        "bindingAge"
-                    )
-                    .classList
-                    .add(
-                        "error-input"
-                    );
-
-            }
-
-
-            /*
-             * Stop here.
-             *
-             * Otherwise the generic mapping below
-             * would incorrectly display the age
-             * error beside the registration age.
-             */
-            return;
-
-        }
-
-
-
-        /*
-         * -----------------------------------------
-         * MethodArgumentNotValidException
-         * -----------------------------------------
-         *
-         * GlobalExceptionHandler returns:
-         *
-         * {
-         *     "errors": {
-         *         "email": [...],
-         *         "password": [...]
-         *     }
-         * }
-         *
-         * The JavaScript dynamically maps:
-         *
-         * email
-         *
-         * to:
-         *
-         * emailError
-         */
-        if (
-            body.errors
-        ) {
-
-
-            Object
-                .entries(
-                    body.errors
-                )
-                .forEach(
-
-                    ([field, messages]) => {
-
-
-                        const errorElement =
-
-                            document
-                                .getElementById(
-                                    field
-                                    + "Error"
-                                );
-
-
-                        const inputElement =
-
-                            document
-                                .getElementById(
-                                    field
-                                );
-
-
-                        if (
-                            errorElement
-                        ) {
-
-                            errorElement
-                                .textContent =
-
-                                    messages.join(
-                                        " | "
-                                    );
-
-                        }
-
-
-                        if (
-                            inputElement
-                        ) {
-
-                            inputElement
-                                .classList
-                                .add(
-                                    "error-input"
-                                );
-
-                        }
-
-                    }
-
-                );
-
-        }
-
-
-
-        /*
-         * -----------------------------------------
-         * HandlerMethodValidationException
-         * -----------------------------------------
-         */
-        if (
-            body.exception ===
-            "HandlerMethodValidationException"
-            &&
-            body.violations
-        ) {
-
-
-            const message =
-
-                body
-                    .violations
-                    .join(
-                        " | "
-                    );
-
-
-            document
-                .getElementById(
-                    "controllerIdError"
-                )
-                .textContent =
-                    message;
-
-
-            document
-                .getElementById(
-                    "controllerId"
-                )
-                .classList
-                .add(
-                    "error-input"
-                );
-
-        }
-
-
-
-        /*
-         * -----------------------------------------
-         * ConstraintViolationException
-         * -----------------------------------------
-         */
-        if (
-            body.exception ===
-            "ConstraintViolationException"
-            &&
-            body.violations
-        ) {
-
-
-            const message =
-
-                body
-                    .violations
-                    .join(
-                        " | "
-                    );
-
-
-            document
-                .getElementById(
-                    "serviceIdError"
-                )
-                .textContent =
-                    message;
-
-
-            document
-                .getElementById(
-                    "serviceId"
-                )
-                .classList
-                .add(
-                    "error-input"
-                );
-
-        }
+    function displayClientError(
+            error) {
+
+
+        document
+            .getElementById(
+                "httpBadge"
+            )
+            .textContent =
+                "HTTP: Request Failed";
+
+
+        document
+            .getElementById(
+                "exceptionBadge"
+            )
+            .textContent =
+                "Exception: Client Error";
+
+
+        document
+            .getElementById(
+                "responseBody"
+            )
+            .textContent =
+                error.message;
 
     }
 
 
 
     /*
-     * =====================================================
-     * Clear field validation errors
-     * =====================================================
+     * Initial state:
+     *
+     * Invalid values are present,
+     * but validation is not run until
+     * Send Request is clicked.
+     *
+     * Load Invalid Data only fills
+     * the fields with invalid examples.
      */
-
-
-    function clearErrors() {
-
-
-        const fields = [
-
-            "username",
-            "email",
-            "password",
-            "age",
-            "dateOfBirth",
-            "phoneNumber",
-
-            "controllerId",
-
-            "serviceId",
-
-            "bindingAge"
-
-        ];
-
-
-        fields.forEach(
-
-            field => {
-
-
-                const input =
-
-                    document
-                        .getElementById(
-                            field
-                        );
-
-
-                if (
-                    input
-                ) {
-
-                    input
-                        .classList
-                        .remove(
-                            "error-input"
-                        );
-
-                }
-
-
-
-                const error =
-
-                    document
-                        .getElementById(
-                            field
-                            + "Error"
-                        );
-
-
-                if (
-                    error
-                ) {
-
-                    error
-                        .textContent =
-                            "";
-
-                }
-
-            }
-
-        );
-
-    }
-
-
-
-    /*
-     * Start the page with invalid data
-     * so students can immediately trigger
-     * validation errors.
-     */
-    loadInvalidUser();
-
+    clearUserErrors();
+    clearUserFormStatus();
 
 </script>
 
-
 </body>
-
 </html>
