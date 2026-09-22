@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Page</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" /> <!-- Link to a stylesheet if needed -->
+</head>
+<body>
+    <div class="container">
+        <h1>Public Page</h1>
+        <p>This is a public page accessible without login.</p>
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/dashboard}">Dashboard</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" /> <!-- Link to a stylesheet if needed -->
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard</h1>
+        <p>Welcome, <span th:text="${session.user}">User</span>!</p>
+        <a th:href="@{/logout}">Logout</a><br>
+        <a th:href="@{/showtime}">Show Current Time</a><br>
+        <a th:href="@{/public}">Public Page</a>
+    </div>
+</body>
+</html>
