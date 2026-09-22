@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Application Submitted</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/preferences}">Language Preference</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <div class="step-header complete">
+        <span class="step-pill done">✓</span>
+        <span>Workflow completed</span>
+    </div>
+
+    <h1>Application Submitted</h1>
+
+    <section class="observe-card success-note">
+        <h2>What to observe after Submit</h2>
+        <ul>
+            <li>The completed application has now been persisted to H2.</li>
+            <li><code>SessionStatus.setComplete()</code> ended the controller workflow, so <code>applicationDraft</code> is no longer present.</li>
+            <li><code>preferredLanguage</code> still exists because it was ordinary session context and was not managed by <code>@SessionAttributes</code>.</li>
+        </ul>
+    </section>
+
+    <section class="form-card">
+        <h2>Saved database record</h2>
+        <div class="review-grid">
+            <div><span>ID</span><strong th:text="${submittedApplication.id}"></strong></div>
+            <div><span>Full name</span><strong th:text="${submittedApplication.fullName}"></strong></div>
+            <div><span>Email</span><strong th:text="${submittedApplication.email}"></strong></div>
+            <div><span>Education</span><strong th:text="${submittedApplication.highestEducation}"></strong></div>
+            <div><span>Current role</span><strong th:text="${submittedApplication.currentRole}"></strong></div>
+            <div><span>Experience</span><strong th:text="${submittedApplication.yearsOfExperience + ' years'}"></strong></div>
+        </div>
+
+        <div class="action-row">
+            <a class="button" th:href="@{/application/start}">Start Another Application</a>
+            <a class="button secondary" th:href="@{/submitted-applications}">View Database Records</a>
+        </div>
+    </section>
+
+    <div th:replace="~{fragments/session-state :: sessionState}"></div>
+</main>
+</body>
+</html>

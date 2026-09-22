@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Application - Work Experience</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/preferences}">Language Preference</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <div class="step-header">
+        <span class="step-pill done">✓</span>
+        <span>Personal Details</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill done">✓</span>
+        <span>Education</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill active">3</span>
+        <span>Experience</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill">4</span>
+        <span>Review</span>
+    </div>
+
+    <h1>Step 3: Work Experience</h1>
+
+    <section class="observe-card">
+        <h2>What to observe</h2>
+        <ul>
+            <li>This is another new HTTP request.</li>
+            <li><code>applicationDraft</code> now contains data collected on two earlier pages.</li>
+            <li><code>preferredLanguage</code> remains unchanged because it is independent session context.</li>
+            <li>The database is still empty until the final Submit action.</li>
+        </ul>
+    </section>
+
+    <section class="form-card">
+        <div class="previous-data">
+            <span>Carried from earlier requests</span>
+            <strong th:text="${applicationDraft.fullName}"></strong>
+            <span th:text="${applicationDraft.highestEducation}"></span>
+        </div>
+
+        <form method="post"
+              th:action="@{/application/experience}"
+              th:object="${applicationDraft}">
+            <label for="currentRole">Current role</label>
+            <input id="currentRole" type="text" th:field="*{currentRole}" required>
+
+            <label for="yearsOfExperience">Years of experience</label>
+            <input id="yearsOfExperience" type="number" min="0" th:field="*{yearsOfExperience}" required>
+
+            <div class="action-row">
+                <button type="submit">Review Application</button>
+                <button class="secondary" type="submit" formnovalidate th:formaction="@{/application/cancel}">Cancel Workflow</button>
+            </div>
+        </form>
+    </section>
+
+    <div th:replace="~{fragments/session-state :: sessionState}"></div>
+</main>
+</body>
+</html>

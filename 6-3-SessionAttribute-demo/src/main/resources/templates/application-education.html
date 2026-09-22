@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Application - Education</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/preferences}">Language Preference</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <div class="step-header">
+        <span class="step-pill done">✓</span>
+        <span>Personal Details</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill active">2</span>
+        <span>Education</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill">3</span>
+        <span>Experience</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill">4</span>
+        <span>Review</span>
+    </div>
+
+    <h1>Step 2: Education</h1>
+
+    <section class="observe-card">
+        <h2>What to observe</h2>
+        <ul>
+            <li>This is a <strong>new HTTP request</strong>.</li>
+            <li>The name and email from Step 1 are still available inside <code>applicationDraft</code>.</li>
+            <li>They were not persisted to H2 and they are not being carried by hidden form fields.</li>
+            <li>That persistence across requests is the purpose of class-level <code>@SessionAttributes</code>.</li>
+        </ul>
+    </section>
+
+    <section class="form-card">
+        <div class="previous-data">
+            <span>Carried from Step 1</span>
+            <strong th:text="${applicationDraft.fullName}"></strong>
+            <span th:text="${applicationDraft.email}"></span>
+        </div>
+
+        <form method="post"
+              th:action="@{/application/education}"
+              th:object="${applicationDraft}">
+            <label for="highestEducation">Highest education</label>
+            <select id="highestEducation" th:field="*{highestEducation}" required>
+                <option value="">-- Select --</option>
+                <option value="Diploma">Diploma</option>
+                <option value="Bachelor Degree">Bachelor Degree</option>
+                <option value="Master Degree">Master Degree</option>
+                <option value="Doctorate">Doctorate</option>
+            </select>
+
+            <div class="action-row">
+                <button type="submit">Continue to Work Experience</button>
+                <button class="secondary" type="submit" formnovalidate th:formaction="@{/application/cancel}">Cancel Workflow</button>
+            </div>
+        </form>
+    </section>
+
+    <div th:replace="~{fragments/session-state :: sessionState}"></div>
+</main>
+</body>
+</html>

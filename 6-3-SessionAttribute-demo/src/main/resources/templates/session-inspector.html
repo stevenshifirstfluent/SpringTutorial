@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Session Inspector</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/preferences}">Language Preference</a>
+    <a th:href="@{/application/start}">Start Application</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <p class="page-kicker">Demo utility</p>
+    <h1>HTTP Session Inspector</h1>
+
+    <section class="observe-card">
+        <h2>How to read this page</h2>
+        <p>
+            Both values can physically appear inside the same <code>HttpSession</code>, but they arrived there for different reasons.
+            The panels below keep that distinction visible.
+        </p>
+    </section>
+
+    <div th:replace="~{fragments/session-state :: sessionState}"></div>
+
+    <section class="form-card" th:if="${!#lists.isEmpty(otherItems)}">
+        <h2>Other session attributes</h2>
+        <table>
+            <thead>
+            <tr><th>Name</th><th>Value/type</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${otherItems}">
+                <td><code th:text="${item.name}"></code></td>
+                <td th:text="${item.value}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

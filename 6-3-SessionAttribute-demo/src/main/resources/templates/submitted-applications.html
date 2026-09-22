@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Submitted Applications</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <h1>Submitted Applications in H2</h1>
+
+    <section class="card teaching">
+        <p>This page shows only durable database records.</p>
+        <p>Walking through Steps 1–3 does <strong>not</strong> create a row here. A row appears only after final Submit.</p>
+    </section>
+
+    <section class="card" th:if="${#lists.isEmpty(applications)}">
+        <p>No application has been submitted yet.</p>
+    </section>
+
+    <table th:unless="${#lists.isEmpty(applications)}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Education</th>
+            <th>Role</th>
+            <th>Years</th>
+            <th>Submitted</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="app : ${applications}">
+            <td th:text="${app.id}"></td>
+            <td th:text="${app.fullName}"></td>
+            <td th:text="${app.email}"></td>
+            <td th:text="${app.highestEducation}"></td>
+            <td th:text="${app.currentRole}"></td>
+            <td th:text="${app.yearsOfExperience}"></td>
+            <td th:text="${app.submittedAt}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <section class="card warning">
+        <h2>Optional H2 Console</h2>
+        <p>Open <code>/h2-console</code> and use JDBC URL <code>jdbc:h2:mem:jobapplicationdb</code>, user <code>sa</code>, no password.</p>
+    </section>
+</main>
+</body>
+</html>

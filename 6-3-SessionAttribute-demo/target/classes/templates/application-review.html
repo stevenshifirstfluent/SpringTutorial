@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Application</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/preferences}">Language Preference</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <div class="step-header">
+        <span class="step-pill done">✓</span>
+        <span>Personal Details</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill done">✓</span>
+        <span>Education</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill done">✓</span>
+        <span>Experience</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill active">4</span>
+        <span>Review</span>
+    </div>
+
+    <h1>Step 4: Review Application</h1>
+
+    <section class="observe-card important">
+        <h2>What to observe</h2>
+        <ul>
+            <li>This page brings the two session mechanisms together.</li>
+            <li><code>preferredLanguage</code> is existing session data read into the method using <code>@SessionAttribute</code>.</li>
+            <li><code>applicationDraft</code> is MVC workflow data built across Steps 1–3 and maintained by class-level <code>@SessionAttributes</code>.</li>
+            <li>There is still no durable database record until you click <strong>Submit Application</strong>.</li>
+        </ul>
+    </section>
+
+    <section class="form-card">
+        <h2>Application to be submitted</h2>
+        <div class="review-grid">
+            <div><span>Full name</span><strong th:text="${applicationDraft.fullName}"></strong></div>
+            <div><span>Email</span><strong th:text="${applicationDraft.email}"></strong></div>
+            <div><span>Education</span><strong th:text="${applicationDraft.highestEducation}"></strong></div>
+            <div><span>Current role</span><strong th:text="${applicationDraft.currentRole}"></strong></div>
+            <div><span>Experience</span><strong th:text="${applicationDraft.yearsOfExperience + ' years'}"></strong></div>
+            <div><span>Preferred language</span><strong th:text="${inspectedPreferredLanguage}"></strong></div>
+        </div>
+
+        <form method="post" th:action="@{/application/submit}">
+            <div class="action-row">
+                <button type="submit">Submit Application</button>
+                <button class="secondary" type="submit" formnovalidate th:formaction="@{/application/cancel}">Cancel Workflow</button>
+            </div>
+        </form>
+    </section>
+
+    <div th:replace="~{fragments/session-state :: sessionState}"></div>
+</main>
+</body>
+</html>

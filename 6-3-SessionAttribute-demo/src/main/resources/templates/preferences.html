@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Language Preference</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/preferences}">Language Preference</a>
+    <a th:href="@{/application/start}">Start Application</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <p class="page-kicker">Before the job-application workflow</p>
+    <h1>Set a Language Preference</h1>
+
+    <section class="observe-card">
+        <h2>What to observe</h2>
+        <ul>
+            <li>This page creates <code>preferredLanguage</code> directly in <code>HttpSession</code>.</li>
+            <li>It exists independently of the later job-application controller.</li>
+            <li>After you click <strong>Store Preference</strong>, look at the session panel below: <code>preferredLanguage</code> should be present while <code>applicationDraft</code> should still be absent.</li>
+            <li>Later, the job-application controller will only read this value using method-parameter <code>@SessionAttribute</code>.</li>
+        </ul>
+    </section>
+
+    <section class="form-card">
+        <p th:if="${message}" class="flash-message" th:text="${message}"></p>
+
+        <form method="post" th:action="@{/preferences}">
+            <label for="preferredLanguage">Preferred language</label>
+            <select id="preferredLanguage" name="preferredLanguage" required>
+                <option value="English" th:selected="${currentLanguage == 'English'}">English</option>
+                <option value="Chinese" th:selected="${currentLanguage == 'Chinese'}">Chinese</option>
+                <option value="French" th:selected="${currentLanguage == 'French'}">French</option>
+            </select>
+
+            <div class="action-row">
+                <button type="submit">Store Preference in HttpSession</button>
+                <a class="button secondary" th:href="@{/application/start}">Start Job Application</a>
+            </div>
+        </form>
+    </section>
+
+    <div th:replace="~{fragments/session-state :: sessionState}"></div>
+</main>
+</body>
+</html>

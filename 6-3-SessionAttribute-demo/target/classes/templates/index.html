@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring MVC Session Demo</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/preferences}">Language Preference</a>
+    <a th:href="@{/application/start}">Start Application</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <p class="page-kicker">Spring MVC demo</p>
+    <h1>One Session, Two Different Purposes</h1>
+    <p class="lead">
+        Follow one job applicant through a multi-page form and watch two pieces of session data behave differently.
+    </p>
+
+    <section class="scenario-card">
+        <div class="scenario-step">
+            <span class="scenario-number">1</span>
+            <div>
+                <h2>Set a user preference</h2>
+                <p><code>preferredLanguage</code> is written directly to <code>HttpSession</code>.</p>
+                <p>Later methods use <code>@SessionAttribute</code> to read it.</p>
+                <a class="button" th:href="@{/preferences}">Set Language Preference</a>
+            </div>
+        </div>
+
+        <div class="scenario-arrow">↓</div>
+
+        <div class="scenario-step">
+            <span class="scenario-number">2</span>
+            <div>
+                <h2>Complete a multi-step application</h2>
+                <p><code>applicationDraft</code> starts as Model data and grows across several requests.</p>
+                <p>Class-level <code>@SessionAttributes</code> keeps that workflow state temporarily.</p>
+                <a class="button" th:href="@{/application/start}">Start Job Application</a>
+            </div>
+        </div>
+
+        <div class="scenario-arrow">↓</div>
+
+        <div class="scenario-step">
+            <span class="scenario-number">3</span>
+            <div>
+                <h2>Submit only when complete</h2>
+                <p>The draft is converted into a JPA entity and saved to H2 only on final Submit.</p>
+                <p>Then <code>SessionStatus.setComplete()</code> removes the controller-managed draft.</p>
+                <a class="button secondary" th:href="@{/submitted-applications}">View Database Records</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="concept-summary-grid">
+        <div class="concept-summary-card existing-context">
+            <p class="concept-type">METHOD PARAMETER</p>
+            <h2><code>@SessionAttribute</code></h2>
+            <p><strong>Question it answers:</strong> “A value already exists in the HTTP session. Can this method read it?”</p>
+            <div class="flow-code">HttpSession → method parameter</div>
+        </div>
+
+        <div class="concept-summary-card workflow-context">
+            <p class="concept-type">CONTROLLER CLASS</p>
+            <h2><code>@SessionAttributes</code></h2>
+            <p><strong>Question it answers:</strong> “Can this controller keep selected Model data across several requests?”</p>
+            <div class="flow-code">Model → session backing → next request</div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

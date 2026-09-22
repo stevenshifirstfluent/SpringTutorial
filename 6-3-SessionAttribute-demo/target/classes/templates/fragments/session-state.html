@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="sessionState" class="session-state-panel">
+    <div class="session-state-heading">
+        <div>
+            <p class="eyebrow">CURRENT SESSION STATE</p>
+            <h2>What is in the session now?</h2>
+            <p class="muted">
+                This is the state for the current HTTP request. After you submit the form above,
+                the next page will show the updated state.
+            </p>
+        </div>
+        <div class="session-id">
+            Session ID<br>
+            <code th:text="${inspectedSessionId}"></code>
+        </div>
+    </div>
+
+    <div class="session-concept-grid">
+        <section class="session-concept existing-context">
+            <p class="concept-type">METHOD PARAMETER</p>
+            <h3><code>@SessionAttribute</code></h3>
+            <p class="concept-summary">Reads data that already exists in <code>HttpSession</code>.</p>
+
+            <div class="session-value-box">
+                <span class="session-key">preferredLanguage</span>
+                <strong class="session-value"
+                        th:text="${inspectedPreferredLanguage != null ? inspectedPreferredLanguage : 'NOT PRESENT'}">
+                    NOT PRESENT
+                </strong>
+            </div>
+
+            <p class="small-note">
+                Created separately using <code>HttpSession.setAttribute(...)</code>.
+                The job-application controller only reads it.
+            </p>
+        </section>
+
+        <section class="session-concept workflow-context">
+            <p class="concept-type">CONTROLLER CLASS</p>
+            <h3><code>@SessionAttributes</code></h3>
+            <p class="concept-summary">Keeps selected MVC Model data across this controller workflow.</p>
+
+            <div class="session-value-box">
+                <span class="session-key">applicationDraft</span>
+                <strong class="session-value"
+                        th:text="${inspectedApplicationDraft != null ? 'PRESENT' : 'NOT PRESENT'}">
+                    NOT PRESENT
+                </strong>
+            </div>
+
+            <div th:if="${inspectedApplicationDraft != null}" class="draft-snapshot">
+                <div>
+                    <span>Full name</span>
+                    <strong th:text="${!#strings.isEmpty(inspectedApplicationDraft.fullName) ? inspectedApplicationDraft.fullName : '—'}"></strong>
+                </div>
+                <div>
+                    <span>Email</span>
+                    <strong th:text="${!#strings.isEmpty(inspectedApplicationDraft.email) ? inspectedApplicationDraft.email : '—'}"></strong>
+                </div>
+                <div>
+                    <span>Education</span>
+                    <strong th:text="${!#strings.isEmpty(inspectedApplicationDraft.highestEducation) ? inspectedApplicationDraft.highestEducation : '—'}"></strong>
+                </div>
+                <div>
+                    <span>Current role</span>
+                    <strong th:text="${!#strings.isEmpty(inspectedApplicationDraft.currentRole) ? inspectedApplicationDraft.currentRole : '—'}"></strong>
+                </div>
+                <div>
+                    <span>Experience</span>
+                    <strong th:text="${inspectedApplicationDraft.yearsOfExperience != null ? inspectedApplicationDraft.yearsOfExperience + ' years' : '—'}"></strong>
+                </div>
+            </div>
+
+            <p th:if="${inspectedApplicationDraft != null}" class="small-note">
+                It started as <code>model.addAttribute("applicationDraft", ...)</code>.
+                Spring MVC is temporarily backing it with the HTTP session.
+            </p>
+            <p th:unless="${inspectedApplicationDraft != null}" class="small-note">
+                No job-application workflow draft is currently present.
+            </p>
+        </section>
+    </div>
+
+    <div class="remember-rule">
+        <strong>Remember:</strong>
+        <code>@SessionAttribute</code> = read existing session data.
+        <code>@SessionAttributes</code> = keep Model workflow data across requests.
+    </div>
+</section>
+</body>
+</html>

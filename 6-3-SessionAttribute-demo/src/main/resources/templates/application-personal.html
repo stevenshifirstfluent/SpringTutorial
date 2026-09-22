@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Application - Personal Details</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav>
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/preferences}">Language Preference</a>
+    <a th:href="@{/session}">Session Inspector</a>
+    <a th:href="@{/submitted-applications}">Database Records</a>
+</nav>
+<main>
+    <div class="step-header">
+        <span class="step-pill active">1</span>
+        <span>Personal Details</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill">2</span>
+        <span>Education</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill">3</span>
+        <span>Experience</span>
+        <span class="step-separator">→</span>
+        <span class="step-pill">4</span>
+        <span>Review</span>
+    </div>
+
+    <h1>Step 1: Personal Details</h1>
+
+    <section class="observe-card">
+        <h2>What to observe</h2>
+        <ul>
+            <li><code>preferredLanguage</code> already existed before this job-application workflow started.</li>
+            <li><code>applicationDraft</code> was just created as a Model attribute and is now maintained by class-level <code>@SessionAttributes</code>.</li>
+            <li>After you click <strong>Continue to Education</strong>, the next HTTP request should still know the name and email you enter here.</li>
+            <li>No job application has been written to H2 yet.</li>
+        </ul>
+    </section>
+
+    <section class="form-card">
+        <form method="post"
+              th:action="@{/application/personal}"
+              th:object="${applicationDraft}">
+            <label for="fullName">Full name</label>
+            <input id="fullName" type="text" th:field="*{fullName}" required>
+
+            <label for="email">Email</label>
+            <input id="email" type="email" th:field="*{email}" required>
+
+            <div class="action-row">
+                <button type="submit">Continue to Education</button>
+                <button class="secondary" type="submit" formnovalidate th:formaction="@{/application/cancel}">Cancel Workflow</button>
+            </div>
+        </form>
+    </section>
+
+    <div th:replace="~{fragments/session-state :: sessionState}"></div>
+</main>
+</body>
+</html>

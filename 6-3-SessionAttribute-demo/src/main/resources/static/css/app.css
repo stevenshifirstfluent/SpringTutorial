@@ -1,0 +1,465 @@
+:root {
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    color: #172033;
+    background: #f4f7fb;
+    line-height: 1.55;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f4f7fb;
+}
+
+nav {
+    background: #172554;
+    padding: 14px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+main {
+    max-width: 1050px;
+    margin: 32px auto;
+    padding: 0 22px 56px;
+}
+
+h1 {
+    margin: 8px 0 18px;
+    color: #0f1f4a;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+}
+
+h2, h3 {
+    color: #172554;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+code {
+    font-family: Consolas, Monaco, monospace;
+}
+
+.page-kicker,
+.eyebrow,
+.concept-type {
+    margin: 0 0 6px;
+    color: #53627a;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.lead {
+    max-width: 760px;
+    font-size: 1.1rem;
+    color: #526079;
+}
+
+/* Step indicator intentionally sits ABOVE the page title. */
+.step-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #667085;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.step-pill {
+    width: 28px;
+    height: 28px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    border: 1px solid #b9c4d5;
+    background: white;
+    color: #526079;
+}
+
+.step-pill.active {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: white;
+}
+
+.step-pill.done {
+    background: #15803d;
+    border-color: #15803d;
+    color: white;
+}
+
+.step-separator {
+    color: #a0aec0;
+}
+
+/* Teaching note intentionally sits IMMEDIATELY BELOW the title. */
+.observe-card,
+.form-card,
+.session-state-panel,
+.scenario-card,
+.concept-summary-card {
+    background: white;
+    border: 1px solid #dbe3ef;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+.observe-card {
+    margin: 0 0 20px;
+    padding: 18px 22px;
+    background: #eef4ff;
+    border-left: 5px solid #3b82f6;
+}
+
+.observe-card.important {
+    background: #f2f0ff;
+    border-left-color: #7c3aed;
+}
+
+.observe-card.success-note {
+    background: #f0fdf4;
+    border-left-color: #16a34a;
+}
+
+.observe-card ul {
+    margin: 8px 0 0;
+    padding-left: 22px;
+}
+
+.observe-card li + li {
+    margin-top: 6px;
+}
+
+/* User action area is kept visually separate and in the middle. */
+.form-card {
+    padding: 28px 30px;
+    margin: 0 0 22px;
+}
+
+label {
+    display: block;
+    font-weight: 800;
+    margin-top: 16px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 13px 14px;
+    margin-top: 7px;
+    border: 1px solid #9fb0ca;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+}
+
+input:focus,
+select:focus {
+    outline: 3px solid rgba(37, 99, 235, 0.14);
+    border-color: #2563eb;
+}
+
+button,
+.button {
+    display: inline-block;
+    border: 0;
+    border-radius: 8px;
+    background: #2454db;
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.96rem;
+}
+
+button.secondary,
+.button.secondary {
+    background: #64748b;
+}
+
+.action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+    align-items: center;
+}
+
+.previous-data {
+    display: grid;
+    gap: 3px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.previous-data > span:first-child {
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.flash-message {
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #ecfdf3;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    font-weight: 700;
+}
+
+/* Session state is intentionally BELOW the user action area. */
+.session-state-panel {
+    margin-top: 22px;
+    padding: 22px;
+    background: #fbfcfe;
+    border-top: 4px solid #334155;
+}
+
+.session-state-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.session-state-heading h2 {
+    margin-bottom: 4px;
+}
+
+.muted,
+.small-note {
+    color: #667085;
+}
+
+.small-note {
+    font-size: 0.9rem;
+}
+
+.session-id {
+    min-width: 215px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: #eef2f7;
+    color: #526079;
+    font-size: 0.78rem;
+}
+
+.session-id code {
+    display: block;
+    margin-top: 3px;
+    color: #172033;
+    word-break: break-all;
+}
+
+.session-concept-grid,
+.concept-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.session-concept,
+.concept-summary-card {
+    padding: 18px;
+    border-radius: 11px;
+    border: 1px solid #dbe3ef;
+    background: white;
+}
+
+.existing-context {
+    border-left: 5px solid #2563eb;
+}
+
+.workflow-context {
+    border-left: 5px solid #16a34a;
+}
+
+.session-concept h3,
+.concept-summary-card h2 {
+    margin: 0 0 6px;
+}
+
+.concept-summary {
+    color: #526079;
+    margin-top: 0;
+}
+
+.session-value-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    margin: 14px 0;
+    border-radius: 9px;
+    background: #f1f5f9;
+}
+
+.session-key {
+    font-family: Consolas, Monaco, monospace;
+    font-weight: 800;
+}
+
+.session-value {
+    color: #0f172a;
+}
+
+.draft-snapshot,
+.review-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.draft-snapshot div,
+.review-grid div {
+    padding: 12px;
+    border-radius: 9px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.draft-snapshot span,
+.review-grid span {
+    display: block;
+    color: #667085;
+    font-size: 0.8rem;
+    margin-bottom: 3px;
+}
+
+.draft-snapshot strong,
+.review-grid strong {
+    display: block;
+}
+
+.remember-rule {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+}
+
+.scenario-card {
+    margin-top: 24px;
+    padding: 24px;
+}
+
+.scenario-step {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+.scenario-number {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: #1d4ed8;
+    color: white;
+    font-weight: 900;
+}
+
+.scenario-step h2 {
+    margin-bottom: 4px;
+}
+
+.scenario-step p {
+    margin: 4px 0;
+}
+
+.scenario-arrow {
+    margin: 8px 0 8px 18px;
+    color: #94a3b8;
+    font-size: 1.6rem;
+}
+
+.concept-summary-grid {
+    margin-top: 22px;
+}
+
+.flow-code {
+    margin-top: 12px;
+    padding: 11px;
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 8px;
+    font-family: Consolas, Monaco, monospace;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 11px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background: #f1f5f9;
+}
+
+@media (max-width: 760px) {
+    main {
+        margin-top: 22px;
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .session-state-heading {
+        display: block;
+    }
+
+    .session-id {
+        margin-top: 12px;
+        min-width: 0;
+    }
+
+    .session-concept-grid,
+    .concept-summary-grid,
+    .draft-snapshot,
+    .review-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .step-header {
+        font-size: 0.8rem;
+    }
+
+    .form-card {
+        padding: 22px 18px;
+    }
+}
