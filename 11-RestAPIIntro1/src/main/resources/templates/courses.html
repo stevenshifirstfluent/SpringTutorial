@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<body>
+		<h2>Course Listing</h2>
+		<table th:if="${not #lists.isEmpty(courses)}">
+			<tr>
+				<th>ID</th>
+				<th>Code</th>
+				<th>Name</th>
+				<th>Description</th>
+			</tr>
+				<tr th:each="course:${courses}">
+				<td th:text=${course.id}>Course ID</td>
+				<td th:text=${course.code}>Course Code</td>
+				<td th:text=${course.name}>Course Name</td>
+				<td th:text=${course.description}>Course Description</td>
+			</tr>
+		</table>
+	</body>
+</html>

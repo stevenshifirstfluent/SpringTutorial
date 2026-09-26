@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="fragments :: layout('Textarea', ~{::section})">
+<section>
+  <form th:action="@{/textarea}" th:object="${form}" method="post" class="vstack gap-3">
+    <textarea class="form-control" th:field="*{textareaValue}"
+              th:rows="${form.textareaRows}" cols="40"></textarea>
+    <button class="btn btn-primary" type="submit">Submit</button>
+  </form>
+
+  <div th:if="${submitted}" class="alert alert-success mt-3">
+    <pre th:text="${submitted.textareaValue}"></pre>
+  </div>
+</section>
+</html>
