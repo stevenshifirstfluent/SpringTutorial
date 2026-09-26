@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Courses</title>
+</head>
+<body>
+<h1>Course List</h1>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+    </tr>
+    <tr th:each="course : ${courses}">
+        <td th:text="${course.id}"></td>
+        <td th:text="${course.name}"></td>
+    </tr>
+</table>
+
+<h2>Add a New Course</h2>
+<form action="#" th:action="@{/courses/create}" method="post">
+    <input type="text" name="name" placeholder="Course Name"/>
+    <button type="submit">Create</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Courses</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+<h1>Course List</h1>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Image</th>
+    </tr>
+    <tr th:each="course : ${courses}">
+        <td th:text="${course.id}"></td>
+        <td th:text="${course.name}"></td>
+        <td><img th:src="@{${course.imagePath}}" alt="Course Image" width="100" /></td>
+    </tr>
+</table>
+
+<h2>Add a New Course</h2>
+<form th:action="@{/courses/create}" method="post" enctype="multipart/form-data">
+    <input type="text" name="name" placeholder="Course Name" required />
+    <input type="file" name="image" required />
+    <button type="submit">Create</button>
+</form>
+<!-- ✅ Error message block -->
+<div th:if="${error}" style="color:red; font-weight: bold;" th:text="${error}"></div>
+<!-- ✅ Success message block -->
+<div th:if="${success}" style="color:green; font-weight: bold;" th:text="${success}"></div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Spring Transaction Demo (UI)</title>
+  <style>
+    body {font-family: system-ui, Arial; margin: 2rem;}
+    .card {border:1px solid #ddd; border-radius:12px; padding:1rem; max-width:720px;}
+    table {width:100%; border-collapse: collapse; margin: 1rem 0;}
+    th, td {border:1px solid #eee; padding:.6rem; text-align:left;}
+    .btn {padding:.6rem 1rem; border-radius:8px; border:1px solid #ccc; background:#f6f6f6; cursor:pointer;}
+    .btn-danger {background:#ffe8e8; border-color:#ffb3b3;}
+    .btn-primary {background:#e8f0ff; border-color:#b3ccff;}
+    .row {display:flex; gap:.5rem; flex-wrap:wrap;}
+    .msg {color:#0a6; margin:.5rem 0;}
+    .err {color:#c00; margin:.5rem 0;}
+  </style>
+</head>
+<body>
+  <h1>Service Layer Transactions — Click to See the Effect</h1>
+
+  <div th:if="${msg}" class="msg" th:text="${msg}"></div>
+  <div th:if="${err}" class="err" th:text="${err}"></div>
+
+  <div class="card">
+    <h2>Balances</h2>
+    <table>
+      <thead><tr><th>Owner</th><th>Balance</th></tr></thead>
+      <tbody>
+        <tr><td th:text="${alice.owner}">Alice</td><td th:text="${alice.balance}">1000.0</td></tr>
+        <tr><td th:text="${bob.owner}">Bob</td><td th:text="${bob.balance}">1000.0</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Actions</h3>
+    <div class="row">
+      <!-- Transactional service -->
+      <form th:action="@{/tx}" method="post">
+        <input type="hidden" name="fail" value="false"/>
+        <button class="btn btn-primary" type="submit">TX: Success (commit)</button>
+      </form>
+      <form th:action="@{/tx}" method="post">
+        <input type="hidden" name="fail" value="true"/>
+        <button class="btn btn-danger" type="submit">TX: Fail (rollback)</button>
+      </form>
+
+      <!-- Non-transactional service -->
+      <form th:action="@{/no-tx}" method="post">
+        <input type="hidden" name="fail" value="false"/>
+        <button class="btn" type="submit">No TX: Success</button>
+      </form>
+      <form th:action="@{/no-tx}" method="post">
+        <input type="hidden" name="fail" value="true"/>
+        <button class="btn btn-danger" type="submit">No TX: Fail (partial commit!)</button>
+      </form>
+    </div>
+  </div>
+
+  <p style="margin-top:1rem;color:#666">
+    Tip: After each click, observe balances above to understand commit vs rollback vs partial commit.
+  </p>
+</body>
+</html>
