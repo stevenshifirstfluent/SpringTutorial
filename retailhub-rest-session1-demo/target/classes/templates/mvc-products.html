@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailHub MVC Products</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1050px; margin: 32px auto; padding: 0 20px; color: #172033; }
+        .banner { background: #102650; color: white; padding: 22px 26px; border-radius: 12px; }
+        .note { background: #edf5ff; border-left: 5px solid #2f68e9; padding: 14px 18px; margin: 18px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+        th, td { border: 1px solid #d6deeb; padding: 11px; text-align: left; }
+        th { background: #eef3f9; }
+        a { color: #1557c0; }
+    </style>
+</head>
+<body>
+<div class="banner">
+    <h1>@Controller MVC Example</h1>
+    <p>The server returned a view name. Thymeleaf generated this HTML page.</p>
+</div>
+<div class="note">
+    Compare this page with <a href="/api/products" target="_blank">GET /api/products</a>,
+    where <strong>@RestController</strong> returns data as JSON instead of resolving a view.
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th><th>Name</th><th>Brand</th><th>Price</th><th>Stock</th><th>Category</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="product : ${products}">
+        <td th:text="${product.id}"></td>
+        <td th:text="${product.name}"></td>
+        <td th:text="${product.brand}"></td>
+        <td th:text="${product.price}"></td>
+        <td th:text="${product.stockQuantity}"></td>
+        <td th:text="${product.categoryId}"></td>
+    </tr>
+    </tbody>
+</table>
+<p><a href="/">← Back to REST demo</a></p>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailHub REST API - Session 1 Demo</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="page-header">
+    <div>
+        <div class="eyebrow">Spring Boot Tutorial · RESTful API · Session 1</div>
+        <h1>RetailHub REST API Live Demo</h1>
+        <p>See the complete path from a user action in the browser to JavaScript <code>fetch()</code>, a Spring REST endpoint, JSON, and an updated UI.</p>
+    </div>
+    <div class="header-actions">
+        <a class="secondary-button" href="#api-playground">Jump to API Playground</a>
+        <a class="secondary-button" href="/mvc/products" target="_blank">Open @Controller MVC Page</a>
+        <a class="secondary-button" href="/h2-console" target="_blank">Open H2 Console</a>
+    </div>
+</header>
+
+<main>
+    <!-- USER INTERACTION IS INTENTIONALLY FIRST -->
+    <section class="panel ui-demo-panel">
+        <div class="section-heading">
+            <div>
+                <span class="step">1</span>
+                <div>
+                    <h2>User Interface — Use the Application First</h2>
+                    <p>Students interact with a normal product UI first. The browser calls the REST API behind the scenes without reloading the page.</p>
+                </div>
+            </div>
+            <span class="no-reload-badge">SPA-style · no page reload</span>
+        </div>
+
+        <div class="ui-workspace">
+            <div class="storefront-card">
+                <div class="demo-subheading">
+                    <div>
+                        <span class="mini-label">CUSTOMER VIEW</span>
+                        <h3>Product Browser</h3>
+                    </div>
+                    <button id="uiReloadProducts" class="secondary-button dark" type="button">Reload Products</button>
+                </div>
+
+                <div class="ui-filter-row">
+                    <label>
+                        Filter by brand
+                        <input id="uiBrandFilter" type="text" placeholder="e.g. Wusthof">
+                    </label>
+                    <button id="uiApplyFilter" class="send-button" type="button">Apply Filter</button>
+                    <button id="uiClearFilter" class="ghost-button" type="button">Clear</button>
+                </div>
+
+                <div id="uiProductStatus" class="ui-status">Loading products from <code>GET /api/products</code>...</div>
+                <div id="uiProductCards" class="product-card-grid" aria-live="polite"></div>
+            </div>
+
+            <div class="storefront-card create-card">
+                <div class="demo-subheading">
+                    <div>
+                        <span class="mini-label">STAFF VIEW</span>
+                        <h3>Create Product</h3>
+                    </div>
+                    <span class="method-pill post">POST</span>
+                </div>
+                <p class="form-intro">Submitting this form converts the fields into JSON and sends them to <code>POST /api/products</code>.</p>
+                <form id="uiCreateForm" class="create-product-form" novalidate>
+                    <label>Name<input id="uiName" name="name" value="Utility Knife"></label>
+                    <label>Brand<input id="uiBrand" name="brand" value="DemoBrand"></label>
+                    <div class="form-row">
+                        <label>Price<input id="uiPrice" name="price" type="number" step="0.01" value="39.90"></label>
+                        <label>Stock<input id="uiStock" name="stockQuantity" type="number" value="12"></label>
+                    </div>
+                    <label>Category ID<input id="uiCategory" name="categoryId" type="number" value="1"></label>
+                    <button class="send-button full-width" type="submit">Create Product</button>
+                </form>
+                <div class="form-tip"><strong>Try validation:</strong> set Name to blank or Price to -1, then submit again.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel integration-panel">
+        <div class="section-heading compact">
+            <div>
+                <span class="step">2</span>
+                <div>
+                    <h2>How the UI Integrates with the REST API</h2>
+                    <p>The trace changes when you filter, create, view, or delete a product above.</p>
+                </div>
+            </div>
+            <span id="uiTraceBadge" class="status-badge neutral">Waiting</span>
+        </div>
+
+        <div class="integration-flow" aria-label="UI to REST API flow">
+            <div><strong>1. User Action</strong><span id="uiActionLabel">Open product page</span></div>
+            <span class="flow-arrow">→</span>
+            <div><strong>2. JavaScript</strong><span><code>fetch(...)</code></span></div>
+            <span class="flow-arrow">→</span>
+            <div><strong>3. REST API</strong><span id="uiEndpointLabel">GET /api/products</span></div>
+            <span class="flow-arrow">→</span>
+            <div><strong>4. JSON</strong><span>HTTP response body</span></div>
+            <span class="flow-arrow">→</span>
+            <div><strong>5. DOM</strong><span>Update what the user sees</span></div>
+        </div>
+
+        <div class="integration-code-grid">
+            <article>
+                <h3>Frontend JavaScript</h3>
+                <pre id="uiFetchCode" class="code-block code-block-short">const response = await fetch('/api/products');
+const products = await response.json();
+renderProducts(products);</pre>
+            </article>
+            <article>
+                <h3>Actual API Response</h3>
+                <pre id="uiApiResponse" class="code-block code-block-short">Waiting for the browser to call the API...</pre>
+            </article>
+        </div>
+        <div class="concept-note callout-note"><strong>Key idea:</strong> the REST API does not build the product cards. It returns data. JavaScript decides how that data is displayed in the browser.</div>
+    </section>
+
+    <section id="api-playground" class="panel interaction-panel">
+        <div class="section-heading">
+            <div>
+                <span class="step">3</span>
+                <div>
+                    <h2>API Playground — Call the Same Endpoints Directly</h2>
+                    <p>Now remove the UI abstraction and inspect the HTTP method, URI, JSON request body and response directly.</p>
+                </div>
+            </div>
+            <button id="resetButton" class="reset-button">Reset Demo Data</button>
+        </div>
+
+        <div class="scenario-grid" aria-label="Classroom scenarios">
+            <button class="scenario get" data-scenario="getAll"><strong>GET</strong><span>All products</span></button>
+            <button class="scenario get" data-scenario="getOne"><strong>GET</strong><span>Product 1</span></button>
+            <button class="scenario get" data-scenario="filter"><strong>GET</strong><span>Filter by brand</span></button>
+            <button class="scenario post" data-scenario="create"><strong>POST</strong><span>Create valid</span></button>
+            <button class="scenario post" data-scenario="invalid"><strong>POST</strong><span>Validation error</span></button>
+            <button class="scenario put" data-scenario="put"><strong>PUT</strong><span>Full replace</span></button>
+            <button class="scenario patch" data-scenario="patch"><strong>PATCH</strong><span>Partial update</span></button>
+            <button class="scenario delete" data-scenario="delete"><strong>DELETE</strong><span>Soft delete</span></button>
+            <button class="scenario error" data-scenario="notFound"><strong>404</strong><span>Not found</span></button>
+        </div>
+
+        <div class="request-builder">
+            <label>
+                HTTP Method
+                <select id="methodSelect">
+                    <option>GET</option>
+                    <option>POST</option>
+                    <option>PUT</option>
+                    <option>PATCH</option>
+                    <option>DELETE</option>
+                </select>
+            </label>
+            <label class="path-field">
+                URI / Endpoint
+                <input id="pathInput" type="text" value="/api/products" spellcheck="false">
+            </label>
+            <button id="sendButton" class="send-button">Send Request</button>
+        </div>
+
+        <label class="body-label" for="bodyInput">JSON Request Body <span>(used by POST / PUT / PATCH)</span></label>
+        <textarea id="bodyInput" class="code-input" rows="9" spellcheck="false"></textarea>
+    </section>
+
+    <section class="inspector-grid">
+        <article class="panel">
+            <div class="section-heading compact">
+                <div><span class="step">4</span><h2>HTTP Request</h2></div>
+            </div>
+            <pre id="requestInspector" class="code-block">GET /api/products HTTP/1.1</pre>
+            <div class="concept-note"><strong>Observe:</strong> method + URI + headers + optional body.</div>
+        </article>
+
+        <article class="panel">
+            <div class="section-heading compact">
+                <div><span class="step">5</span><h2>HTTP Response</h2></div>
+                <span id="statusBadge" class="status-badge neutral">Not sent</span>
+            </div>
+            <pre id="responseInspector" class="code-block">Send a request to see status, headers and JSON body.</pre>
+            <div class="concept-note"><strong>Observe:</strong> status code + response headers + response body.</div>
+        </article>
+    </section>
+
+    <section class="panel">
+        <div class="section-heading">
+            <div>
+                <span class="step">6</span>
+                <div>
+                    <h2>Current Active Products</h2>
+                    <p>This diagnostic table is also populated by <code>GET /api/products</code>. Deleted products disappear because this demo uses soft delete.</p>
+                </div>
+            </div>
+            <button id="refreshProducts" class="secondary-button dark">Refresh</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Brand</th><th>Price</th><th>Stock</th><th>Category</th>
+                </tr>
+                </thead>
+                <tbody id="productTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel teaching-panel">
+        <div class="section-heading compact">
+            <div><span class="step">7</span><h2>What Spring Is Doing</h2></div>
+        </div>
+        <div class="flow">
+            <div>Browser / Client</div><span>→</span>
+            <div>DispatcherServlet</div><span>→</span>
+            <div>@RestController</div><span>→</span>
+            <div>ProductService</div><span>→</span>
+            <div>Repository / H2</div>
+        </div>
+        <div class="teaching-grid">
+            <div><strong>@PathVariable</strong><span>Data from <code>/products/{id}</code></span></div>
+            <div><strong>@RequestParam</strong><span>Data from <code>?brand=Wusthof</code></span></div>
+            <div><strong>@RequestBody</strong><span>JSON → Java via Jackson</span></div>
+            <div><strong>ResponseEntity</strong><span>Status + headers + body</span></div>
+            <div><strong>@Valid</strong><span>Reject invalid request data</span></div>
+            <div><strong>@RestControllerAdvice</strong><span>Consistent JSON errors</span></div>
+        </div>
+    </section>
+
+    <section class="panel comparison-panel">
+        <h2>@Controller vs @RestController — Same Spring MVC Infrastructure</h2>
+        <div class="comparison-grid">
+            <div>
+                <h3>@Controller</h3>
+                <p>Returns a view name by default. Spring/Thymeleaf prepares the HTML on the server.</p>
+                <code>return "mvc-products";</code>
+                <a href="/mvc/products" target="_blank">Open the Thymeleaf result →</a>
+            </div>
+            <div>
+                <h3>@RestController + JavaScript UI</h3>
+                <p>The controller returns data. The browser's JavaScript calls the API and creates the UI from JSON.</p>
+                <code>fetch('/api/products') → JSON → renderProducts()</code>
+                <a href="/api/products" target="_blank">Open the raw JSON result →</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    Teaching helper: <code>POST /api/demo/reset</code> resets H2 data. It is not part of the Product business API.
+</footer>
+<script src="/ui-integration.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
